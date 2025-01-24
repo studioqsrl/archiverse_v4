@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: archiverse
-        image: ghcr.io/archiverse/archiverse:latest # Will be patched by overlays
+        image: archiverseacr.azurecr.io/archiverse:latest # Will be patched by overlays
         ports:
         - containerPort: 3000
         resources:
