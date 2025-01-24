@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: archiverse
+  namespace: archiverse
+spec:
+  selector:
+    matchLabels:
+      app: archiverse
+  template:
+    metadata:
+      labels:
+        app: archiverse
+    spec:
+      containers:
+      - name: archiverse
+        image: ghcr.io/archiverse/archiverse:latest # Will be patched by overlays
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        env:
+        - name: NODE_ENV
+          value: production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: archiverse
+  namespace: archiverse
+spec:
+  selector:
+    app: archiverse
+  ports:
+  - port: 80
+    targetPort: 3000
+  type: ClusterIP
