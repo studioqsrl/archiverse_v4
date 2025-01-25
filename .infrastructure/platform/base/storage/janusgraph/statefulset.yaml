@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: janusgraph
+  namespace: archiverse
 spec:
   serviceName: janusgraph
   replicas: 3
@@ -13,6 +14,15 @@ spec:
       labels:
         app: janusgraph
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: agentpool
+                operator: In
+                values:
+                - storagepool
       containers:
       - name: janusgraph
         image: janusgraph/janusgraph:latest
@@ -27,21 +37,18 @@ spec:
             cpu: "4"
             memory: "8Gi"
         env:
-        - name: CASSANDRA_USER
-          valueFrom:
-            secretKeyRef:
-              name: cassandra-credentials
-              key: username
-        - name: CASSANDRA_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: cassandra-credentials
-              key: password
+        - name: CASSANDRA_USER_FILE
+          value: /mnt/secrets-store/cassandra-username
+        - name: CASSANDRA_PASSWORD_FILE
+          value: /mnt/secrets-store/cassandra-password
         volumeMounts:
         - name: janusgraph-config
           mountPath: /etc/opt/janusgraph
         - name: janusgraph-data
           mountPath: /var/lib/janusgraph
+        - name: secrets-store
+          mountPath: /mnt/secrets-store
+          readOnly: true
         readinessProbe:
           tcpSocket:
             port: 8182
@@ -52,16 +59,27 @@ spec:
             port: 8182
           initialDelaySeconds: 120
           periodSeconds: 20
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsGroup: 1000
       volumes:
       - name: janusgraph-config
         configMap:
           name: janusgraph-config
+          defaultMode: 0777
+      - name: secrets-store
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: archiverse-secrets
   volumeClaimTemplates:
   - metadata:
       name: janusgraph-data
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: standard
+      storageClassName: managed-csi
       resources:
         requests:
           storage: 50Gi

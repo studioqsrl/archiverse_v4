@@ -2,11 +2,12 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: janusgraph-config
+  namespace: archiverse
 data:
   janusgraph.properties: |
     # Storage Configuration
     storage.backend=cql
-    storage.hostname=cassandra
+    storage.hostname=cassandra.archiverse.svc.cluster.local
     storage.cql.keyspace=arch_graph
     storage.cql.read-consistency-level=QUORUM
     storage.cql.write-consistency-level=QUORUM

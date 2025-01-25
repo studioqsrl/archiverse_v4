@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cassandra-config
+  namespace: archiverse
 data:
   cassandra.yaml: |
     cluster_name: 'arch-graph-cluster'
@@ -12,7 +13,7 @@ data:
     seed_provider:
       - class_name: org.apache.cassandra.locator.SimpleSeedProvider
         parameters:
-          - seeds: "cassandra-0.cassandra.default.svc.cluster.local"
+          - seeds: "cassandra-0.cassandra.archiverse.svc.cluster.local"
     listen_address: ${POD_IP}
     broadcast_address: ${POD_IP}
     start_native_transport: true

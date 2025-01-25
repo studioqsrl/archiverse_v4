@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: cassandra
+  namespace: archiverse
 spec:
   serviceName: cassandra
   replicas: 3
@@ -13,7 +14,25 @@ spec:
       labels:
         app: cassandra
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: agentpool
+                operator: In
+                values:
+                - storagepool
       terminationGracePeriodSeconds: 1800
+      initContainers:
+      - name: init-config
+        image: busybox
+        command: ['sh', '-c', 'cp /config-template/* /config/ && chown -R 999:999 /config/ && chmod -R 755 /config/']
+        volumeMounts:
+        - name: cassandra-config-template
+          mountPath: /config-template
+        - name: cassandra-config
+          mountPath: /config
       containers:
       - name: cassandra
         image: cassandra:4.1
@@ -51,7 +70,7 @@ spec:
           - name: HEAP_NEWSIZE
             value: "2G"
           - name: CASSANDRA_SEEDS
-            value: "cassandra-0.cassandra.default.svc.cluster.local"
+            value: "cassandra-0.cassandra.archiverse.svc.cluster.local"
           - name: CASSANDRA_CLUSTER_NAME
             value: "arch-graph-cluster"
           - name: CASSANDRA_DC
@@ -66,21 +85,41 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
+          - name: CASSANDRA_CONF
+            value: /opt/cassandra/conf
+          - name: CASSANDRA_USER_FILE
+            value: /mnt/secrets-store/cassandra-username
+          - name: CASSANDRA_PASSWORD_FILE
+            value: /mnt/secrets-store/cassandra-password
         volumeMounts:
         - name: cassandra-data
           mountPath: /var/lib/cassandra
         - name: cassandra-config
-          mountPath: /etc/cassandra
+          mountPath: /etc/cassandra/cassandra.yaml
+          subPath: cassandra.yaml
+        - name: secrets-store
+          mountPath: /mnt/secrets-store
+          readOnly: true
+      securityContext:
+        fsGroup: 999
+        runAsUser: 999
+        runAsGroup: 999
       volumes:
         - name: cassandra-config
           configMap:
             name: cassandra-config
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: archiverse-secrets
   volumeClaimTemplates:
   - metadata:
       name: cassandra-data
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: standard
+      storageClassName: managed-csi
       resources:
         requests:
           storage: 100Gi
