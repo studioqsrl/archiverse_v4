@@ -19,3 +19,5 @@ COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 3000
 CMD ["npm", "start"]
+
+# Build timestamp: 2025-01-25 17:07:50
