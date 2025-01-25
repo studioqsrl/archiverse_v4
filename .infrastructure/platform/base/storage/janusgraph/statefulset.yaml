@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: janusgraph
+spec:
+  serviceName: janusgraph
+  replicas: 3
+  selector:
+    matchLabels:
+      app: janusgraph
+  template:
+    metadata:
+      labels:
+        app: janusgraph
+    spec:
+      containers:
+      - name: janusgraph
+        image: janusgraph/janusgraph:latest
+        ports:
+        - containerPort: 8182
+          name: gremlin
+        resources:
+          requests:
+            cpu: "2"
+            memory: "4Gi"
+          limits:
+            cpu: "4"
+            memory: "8Gi"
+        env:
+        - name: CASSANDRA_USER
+          valueFrom:
+            secretKeyRef:
+              name: cassandra-credentials
+              key: username
+        - name: CASSANDRA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cassandra-credentials
+              key: password
+        volumeMounts:
+        - name: janusgraph-config
+          mountPath: /etc/opt/janusgraph
+        - name: janusgraph-data
+          mountPath: /var/lib/janusgraph
+        readinessProbe:
+          tcpSocket:
+            port: 8182
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 8182
+          initialDelaySeconds: 120
+          periodSeconds: 20
+      volumes:
+      - name: janusgraph-config
+        configMap:
+          name: janusgraph-config
+  volumeClaimTemplates:
+  - metadata:
+      name: janusgraph-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: standard
+      resources:
+        requests:
+          storage: 50Gi
