@@ -5,6 +5,7 @@ resources:
   - deployment.yaml
   - ingress.yaml
   - cert-manager.yaml
+  - secret-provider.yaml
 
 commonLabels:
   app.kubernetes.io/managed-by: flux
