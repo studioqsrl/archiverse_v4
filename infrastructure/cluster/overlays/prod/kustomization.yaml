@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - ../../base
+  - secrets.yaml
 
 namespace: archiverse
 
@@ -20,21 +21,6 @@ patches:
     target:
       kind: Ingress
       name: archiverse
-
-  - patch: |-
-      apiVersion: v1
-      kind: Secret
-      metadata:
-        name: archiverse-env
-        namespace: archiverse
-      stringData:
-        APP_BASE_URL: "https://archiverse.studioq.biz"
-        SESSION_ENCRYPTION_SECRET: "c1fc12f5ef9ed17847709676c22f26985fe75bc597369e8a7fcc3fa02ca0887f"
-        AUTH0_CLIENT_SECRET: "J9aY-IulZAQDtjeWNNLuC4JNRNb7jI4Qzr7UKoPMkeI0Zwcd1rHyZCkOtKBTrGKE"
-        AUTH0_MANAGEMENT_CLIENT_SECRET: "7kdLfE6WKWagJ901bmN2gnj5OlNR11SqcjC4YMUdGFNj3IYdsUflYiSTMTw_J6Rr"
-    target:
-      kind: Secret
-      name: archiverse-env
 
   - patch: |-
       - op: replace

@@ -16,7 +16,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 3m0s
-  path: ./infrastructure/cluster/base
+  path: ./infrastructure/cluster/overlays/prod
   prune: true
   sourceRef:
     kind: GitRepository
