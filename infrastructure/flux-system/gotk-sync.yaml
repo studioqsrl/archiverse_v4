@@ -15,7 +15,7 @@ metadata:
   name: archiverse
   namespace: flux-system
 spec:
-  interval: 10m0s
+  interval: 3m0s
   path: ./infrastructure/cluster/base
   prune: true
   sourceRef:

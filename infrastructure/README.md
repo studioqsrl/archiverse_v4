@@ -6,19 +6,36 @@ This directory contains the infrastructure configuration for the Archiverse proj
 ## Directory Structure
 ```
 infrastructure/
-├── cluster/                 # Kubernetes manifests
-│   ├── base/               # Base configurations
-│   │   ├── deployment.yaml # Main application deployment
-│   │   ├── ingress.yaml   # Ingress configuration
-│   │   └── cert-manager.yaml # TLS certificate management
+├── auth0/                  # Auth0 utility scripts
+│   ├── delete-auth0-resources.mjs
+│   └── reset-tenant.js
+├── base/                   # Base namespace definitions
+│   ├── kustomization.yaml
+│   └── namespaces/
+│       └── archiverse.yaml
+├── cluster/                # Kubernetes manifests
+│   ├── base/              # Base configurations
+│   │   ├── cert-manager.yaml  # TLS certificate management
+│   │   ├── deployment.yaml    # Main application deployment
+│   │   ├── ingress.yaml      # Ingress configuration
+│   │   ├── kustomization.yaml
+│   │   └── secrets.yaml      # Base secrets configuration
 │   └── overlays/          # Environment-specific configurations
 │       ├── dev/           # Development environment
+│       │   ├── ingress-patch.yaml
+│       │   ├── kustomization.yaml
+│       │   └── secrets.yaml
 │       ├── staging/       # Staging environment
+│       │   ├── ingress-patch.yaml
+│       │   ├── kustomization.yaml
+│       │   └── secrets.yaml
 │       └── prod/          # Production environment
+│           ├── ingress-patch.yaml
+│           ├── kustomization.yaml
+│           └── secrets.yaml
 └── flux-system/           # Flux GitOps configuration
     ├── gotk-sync.yaml     # Git repository synchronization
     └── kustomization.yaml # Flux system configuration
-
 ```
 
 ## Components
@@ -26,7 +43,7 @@ infrastructure/
 ### 1. GitOps with Flux
 - **Repository**: https://github.com/studioqsrl/archiverse_v4
 - **Branch**: main
-- **Path**: ./infrastructure/cluster/base
+- **Path**: ./infrastructure/cluster/overlays/{env}
 - **Sync Interval**: 10 minutes
 - **Prune**: Enabled (removes deleted resources)
 
@@ -58,8 +75,8 @@ infrastructure/
 
 #### Infrastructure Changes
 1. Changes committed to Git repository
-2. Flux detects changes in infrastructure/cluster/base
-3. Changes automatically applied to cluster
+2. Flux detects changes in infrastructure/cluster/overlays/{env}
+3. Changes automatically applied to cluster based on environment
 4. Status reported back through Flux
 
 #### Application Updates

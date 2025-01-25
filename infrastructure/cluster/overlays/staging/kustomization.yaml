@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - ../../base
+  - secrets.yaml
 
 namespace: archiverse
 
@@ -10,6 +11,10 @@ commonLabels:
   environment: staging
 
 patches:
+  - path: ingress-patch.yaml
+    target:
+      kind: Ingress
+      name: archiverse
   - patch: |-
       - op: replace
         path: /spec/template/spec/containers/0/resources/requests/cpu
