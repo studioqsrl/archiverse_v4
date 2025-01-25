@@ -1,7 +1,10 @@
 # syntax=docker/dockerfile:1
-ARG TARGETPLATFORM=linux/arm64n# syntax=docker/dockerfile:1
-ARG TARGETPLATFORM=linux/arm64n# Build stage
-FROM --platform=linux/arm64 node:20-alpine AS builder
+
+# Build stage
+FROM --platform=$BUILDPLATFORM node:20-alpine AS builder
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -9,7 +12,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM --platform=linux/arm64 node:20-alpine AS runner
+FROM --platform=$TARGETPLATFORM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -21,7 +24,5 @@ COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 3000
 CMD ["npm", "start"]
-
-# Build timestamp: 2025-01-25 17:07:50
 
 # Build timestamp: 2025-01-25 17:22:04
