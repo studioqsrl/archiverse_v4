@@ -13,16 +13,16 @@ spec:
         app: archiverse
     spec:
       imagePullSecrets:
-      - name: acr-secret
+      - name: acr-auth
       containers:
       - name: archiverse
-        image: archiverseacr.azurecr.io/archiverse:latest # {"$imagepolicy": "flux-system:archiverse"}
+        image: archiverseacr.azurecr.io/archiverse:latest
         ports:
         - containerPort: 3000
         resources:
           requests:
-            cpu: 100m
-            memory: 128Mi
+            cpu: 200m
+            memory: 256Mi
           limits:
             cpu: 500m
             memory: 512Mi
