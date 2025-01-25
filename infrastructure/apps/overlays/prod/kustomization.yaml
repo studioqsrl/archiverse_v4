@@ -13,7 +13,7 @@ labels:
 
 images:
 - name: archiverseacr.azurecr.io/archiverse
-  newTag: latest
+  newTag: ec45db75f284630f856144624b5e69e1bfd9b27
 
 patches:
   - path: ingress-patch.yaml
