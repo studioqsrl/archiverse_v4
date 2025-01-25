@@ -16,7 +16,7 @@ spec:
       - name: acr-secret
       containers:
       - name: archiverse
-        image: archiverseacr.azurecr.io/archiverse:latest # Will be patched by overlays
+        image: archiverseacr.azurecr.io/archiverse:latest # {"$imagepolicy": "flux-system:archiverse"}
         ports:
         - containerPort: 3000
         resources:
