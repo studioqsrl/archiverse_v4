@@ -3,6 +3,9 @@ kind: Kustomization
 
 resources:
   - deployment.yaml
+  - secrets.yaml
+  - ingress.yaml
+  - cert-manager.yaml
 
 commonLabels:
   app.kubernetes.io/managed-by: flux

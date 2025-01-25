@@ -13,6 +13,8 @@ A secure and high-performance starting point for building modern B2B SaaS web ap
 
 ## Overview
 
+![Build and Deploy](https://github.com/auth0-developer-hub/auth0-b2b-saas-starter/actions/workflows/build-deploy.yml/badge.svg)
+
 ![image](https://github.com/auth0-developer-hub/auth0-b2b-saas-starter/assets/6372810/e8ab12fe-d95b-4e11-8e9e-242eb9c547b6)
 
 > [!TIP]
@@ -42,7 +44,111 @@ Use this to bootstrap a SaaS application with the following commonly needed capa
   - Session lifetime _(coming soon)_
   - Break-glass access for admin roles _(coming soon)_
 
-## Deploy to Vercel
+## Deployment Options
+
+### Deploy to Kubernetes
+This project includes a complete GitOps-based deployment pipeline for Kubernetes:
+- Automated Docker image builds using Azure Container Registry
+- Kustomize-based configuration for different environments
+- GitHub Actions workflow for CI/CD
+- GitOps-friendly manifest updates via Pull Requests
+
+To deploy to Kubernetes:
+
+1. Set up Azure Container Registry:
+   ```bash
+   # Login to Azure
+   az login
+   
+   # Create resource group if needed
+   az group create --name archiverse-rg --location eastus
+   
+   # Create Azure Container Registry
+   az acr create --resource-group archiverse-rg \
+     --name archiverseacr --sku Standard
+   
+   # Create service principal for GitHub Actions
+   az ad sp create-for-rbac \
+     --name "archiverse-github-actions" \
+     --role AcrPush \
+     --scope $(az acr show --name archiverseacr --query id -o tsv) \
+     --sdk-auth
+   ```
+   
+   Copy the entire JSON output from the last command.
+
+2. Add Azure Credentials to GitHub:
+   - Go to your GitHub repository
+   - Navigate to Settings > Secrets and variables > Actions
+   - Click "New repository secret"
+   - Name: AZURE_CREDENTIALS
+   - Value: Paste the entire JSON output from the previous step
+
+3. Install and Configure Flux (example GitOps operator):
+   ```bash
+   # Install Flux CLI
+   brew install fluxcd/tap/flux
+   
+   # Create archiverse namespace
+   kubectl create namespace archiverse
+   
+   # Bootstrap Flux
+   flux bootstrap github \
+     --owner=$GITHUB_USER \
+     --repository=archiverse_v4 \
+     --branch=main \
+     --path=./infrastructure/apps \
+     --personal
+   
+   # Create Kustomization for environments
+   flux create kustomization archiverse-dev \
+     --source=flux-system \
+     --path="./infrastructure/apps/overlays/dev" \
+     --prune=true \
+     --interval=1m \
+     --target-namespace=archiverse
+   
+   flux create kustomization archiverse-prod \
+     --source=flux-system \
+     --path="./infrastructure/apps/overlays/prod" \
+     --prune=true \
+     --interval=1m \
+     --target-namespace=archiverse
+   ```
+
+4. Configure ACR Access in Kubernetes:
+   ```bash
+   # Create Docker registry secret
+   kubectl create secret docker-registry acr-secret \
+     --namespace archiverse \
+     --docker-server=archiverseacr.azurecr.io \
+     --docker-username=$(az acr credential show -n archiverseacr --query "username" -o tsv) \
+     --docker-password=$(az acr credential show -n archiverseacr --query "passwords[0].value" -o tsv)
+   ```
+
+The GitHub Actions workflow will now:
+- Build and push Docker images to ACR
+- Update Kustomize manifests with new image tags
+- Create PRs for GitOps-based deployments
+
+Flux will:
+- Watch the repository for changes
+- Automatically apply updates when PRs are merged
+- Maintain the desired state in your cluster
+
+To verify the setup:
+```bash
+# Check Flux is running
+flux get all
+
+# Check pods are running
+kubectl get pods -n archiverse
+
+# View Flux logs
+flux logs --all-namespaces
+```
+
+### Deploy to Vercel
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/auth0-developer-hub/auth0-b2b-saas-starter&repository-name=auth0-saas-starter&external-id=b2b-saas-starter-template&integration-ids=oac_7V7TGP5JUHCpSncpiy3XWwL0)
 
 ## Installation for Local Development

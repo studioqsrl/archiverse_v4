@@ -12,6 +12,8 @@ spec:
       labels:
         app: archiverse
     spec:
+      imagePullSecrets:
+      - name: acr-secret
       containers:
       - name: archiverse
         image: archiverseacr.azurecr.io/archiverse:latest # Will be patched by overlays
@@ -27,6 +29,9 @@ spec:
         env:
         - name: NODE_ENV
           value: production
+        envFrom:
+        - secretRef:
+            name: archiverse-env
 ---
 apiVersion: v1
 kind: Service

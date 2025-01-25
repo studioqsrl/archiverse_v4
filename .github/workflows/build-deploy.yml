@@ -1,89 +1,106 @@
 name: Build and Deploy
+
 on:
   push:
-    branches: [develop, staging, main]
+    branches: [ main, develop ]
   pull_request:
-    branches: [develop]
+    branches: [ main, develop ]
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  ACR_NAME: archiverseacr
+  IMAGE_NAME: archiverse
 
+# Prevent concurrent deployments for same ref/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+  
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      packages: write
+      contents: write
+      pull-requests: write
     
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Log in to the Container registry
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Needed for PR creation
+      
+      - name: Set up yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod a+x /usr/local/bin/yq
+      
+      - name: Login to Azure Container Registry
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=sha,format=long
-      
-      - name: Build and push Docker image
+          registry: ${{ env.ACR_NAME }}.azurecr.io
+          username: ${{ fromJson(secrets.AZURE_CREDENTIALS).clientId }}
+          password: ${{ fromJson(secrets.AZURE_CREDENTIALS).clientSecret }}
+          
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Build and push image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'production' || github.ref == 'refs/heads/staging' && 'staging' || 'development' }}
-    
-    steps:
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-      
-      - name: Set AKS context
-        uses: azure/aks-set-context@v3
-        with:
-          resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
-          cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
-      
-      - name: Install Flux
+          platforms: linux/arm64
+          tags: |
+            ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=registry,ref=${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:buildcache,mode=max
+            
+      - name: Get short SHA
+        id: sha
+        run: echo "SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
+          
+      - name: Determine environment
         run: |
-          az k8s-extension create \
-            --name flux \
-            --extension-type microsoft.flux \
-            --scope cluster \
-            --cluster-name ${{ secrets.AKS_CLUSTER_NAME }} \
-            --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} \
-            --cluster-type managedClusters \
-            --auto-upgrade-minor-version true
-
-      - name: Configure Flux
+          if [[ ${{ github.ref }} == refs/heads/main ]]; then
+            echo "DEPLOY_ENV=prod" >> $GITHUB_ENV
+          else
+            echo "DEPLOY_ENV=dev" >> $GITHUB_ENV
+          fi
+          
+      - name: Configure Git
         run: |
-          az k8s-configuration flux create \
-            --name archiverse-flux-config \
-            --cluster-name ${{ secrets.AKS_CLUSTER_NAME }} \
-            --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} \
-            --cluster-type managedClusters \
-            --scope cluster \
-            --namespace flux-system \
-            --kind git \
-            --url ${{ github.server_url }}/${{ github.repository }} \
-            --branch ${{ github.ref_name }} \
-            --kustomization name=infrastructure path=./infrastructure/base prune=true \
-            --kustomization name=apps path=./infrastructure/apps/overlays/${{ github.ref == 'refs/heads/main' && 'prod' || github.ref == 'refs/heads/staging' && 'staging' || 'dev' }}
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@archiverse.dev"
+          
+      - name: Update Kustomization
+        run: |
+          # Create new branch
+          git checkout -b update-image-${{ env.SHORT_SHA }}
+          
+          # Update image tag in kustomization
+          cd infrastructure/apps/overlays/${{ env.DEPLOY_ENV }}
+          
+          # Update image tag using yq
+          yq e -i '.images[0].newTag = "${{ github.sha }}"' kustomization.yaml
+          
+          # Commit and push changes
+          git add kustomization.yaml
+          git commit -m "Update image tag to ${{ github.sha }} for ${{ env.DEPLOY_ENV }} environment"
+          git push origin update-image-${{ env.SHORT_SHA }}
+          
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          title: "Update ${{ env.DEPLOY_ENV }} image to ${{ github.sha }}"
+          body: |
+            Automated PR to update image tag for ${{ env.DEPLOY_ENV }} environment
+            
+            - New image tag: `${{ github.sha }}`
+            - Environment: `${{ env.DEPLOY_ENV }}`
+            - Triggered by commit: ${{ github.sha }}
+          branch: update-image-${{ env.SHORT_SHA }}
+          base: ${{ github.ref_name }}
+          delete-branch: true
+          labels: |
+            automated-pr
+            image-update
+            environment/${{ env.DEPLOY_ENV }}

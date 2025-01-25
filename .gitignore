@@ -27,6 +27,11 @@ yarn-error.log*
 
 # local env files
 .env*.local
+config.json
+tenant.json
+
+# secrets
+**/secrets.yaml
 
 # vercel
 .vercel
