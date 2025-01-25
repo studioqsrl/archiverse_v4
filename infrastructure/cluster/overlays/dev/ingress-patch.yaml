@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: archiverse
+  namespace: archiverse
+spec:
+  tls:
+  - hosts:
+    - archiverse-dev.studioq.biz
+    secretName: archiverse-dev-tls
+  rules:
+  - host: archiverse-dev.studioq.biz
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: archiverse
+            port:
+              number: 80
