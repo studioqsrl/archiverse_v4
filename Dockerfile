@@ -1,4 +1,6 @@
-# Build stage
+# syntax=docker/dockerfile:1
+ARG TARGETPLATFORM=linux/arm64n# syntax=docker/dockerfile:1
+ARG TARGETPLATFORM=linux/arm64n# Build stage
 FROM --platform=linux/arm64 node:20-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
@@ -21,3 +23,5 @@ EXPOSE 3000
 CMD ["npm", "start"]
 
 # Build timestamp: 2025-01-25 17:07:50
+
+# Build timestamp: 2025-01-25 17:22:04
