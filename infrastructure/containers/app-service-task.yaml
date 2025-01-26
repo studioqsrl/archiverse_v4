@@ -2,10 +2,11 @@ version: v1.1.0
 
 steps:
   - build: >
-      --platform linux/arm64
-      -t archiverseacr.azurecr.io/app-service:latest
+      -t {{.Run.Registry}}/app-service:{{.Run.ID}}
+      -t {{.Run.Registry}}/app-service:latest
       --build-arg BUILDPLATFORM=linux/amd64
       --build-arg TARGETPLATFORM=linux/arm64
+      --platform linux/arm64
       backend/app_service
     workingDirectory: .
 
