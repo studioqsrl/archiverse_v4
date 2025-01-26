@@ -45,12 +45,20 @@ export default async function DashboardLayout({
             currentOrgId={session.user.org_id}
           />
 
-          <Link
-            href="/dashboard"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Home
-          </Link>
+          <div className="flex space-x-6">
+            <Link
+              href="/dashboard"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Home
+            </Link>
+            <Link
+              href="/dashboard/data"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Data
+            </Link>
+          </div>
         </div>
 
         <div className="flex flex-row gap-x-4">

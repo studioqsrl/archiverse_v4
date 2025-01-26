@@ -5,7 +5,7 @@ This directory contains the infrastructure configurations for the Enterprise Arc
 ## Directory Structure
 
 ```
-.infrastructure/
+infrastructure/
 ├── containers/           # Container management
 │   ├── README.md
 │   ├── acr-task.yaml
@@ -60,6 +60,13 @@ This directory contains the infrastructure configurations for the Enterprise Arc
 ```
 
 ## Components
+
+### Application Services
+- **App Service**: FastAPI-based service that provides PostgreSQL data access
+  - Deployed with the same node pool as frontend
+  - Internal cluster communication via Service
+  - Network policies for secure PostgreSQL access
+  - Health monitoring and Auth0 integration
 
 ### Container Management (/containers)
 - Container image build configurations
@@ -163,6 +170,15 @@ The storage layer is built on JanusGraph with Apache Cassandra as the backend st
    kubectl rollout status statefulset/janusgraph
    ```
 
+4. Deploy App Service:
+   ```bash
+   kubectl apply -f platform/base/app-service.yaml
+   ```
+   Wait for the app service to be ready:
+   ```bash
+   kubectl rollout status deployment/app-service
+   ```
+
 ## Environment Management
 
 The infrastructure supports multiple environments through Kustomize overlays:
@@ -204,6 +220,11 @@ kubectl get pods -l app=janusgraph
 
 # Monitor deployments
 ./containers/monitor-deployment.sh
+
+# Check App Service status
+kubectl get pods -l app=app-service
+kubectl logs -l app=app-service
+kubectl get service app-service
 ```
 
 ## Best Practices
