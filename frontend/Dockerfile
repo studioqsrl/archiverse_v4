@@ -7,15 +7,14 @@ WORKDIR /app
 
 # Configure npm and Next.js
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm install -g npm@latest && \
+RUN npm install -g npm@latest update-browserslist-db@latest && \
     npm config set update-notifier false && \
     npm config set fund false && \
     npm config set audit false
 
 # Install dependencies
 COPY frontend/package*.json ./
-RUN npm ci && \
-    npx update-browserslist-db@latest --yes
+RUN npm ci
 
 # Build application
 COPY frontend/ ./
