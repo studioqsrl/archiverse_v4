@@ -1,9 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Build stage
-FROM --platform=$BUILDPLATFORM node:20-alpine AS builder
-ARG TARGETPLATFORM
-ARG BUILDPLATFORM
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -24,7 +22,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM --platform=$TARGETPLATFORM node:20-alpine AS runner
+FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production \
