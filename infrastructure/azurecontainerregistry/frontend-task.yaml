@@ -1,0 +1,7 @@
+name: frontend-build
+registry: archiverseacr
+image: frontend:{{.Run.ID}}
+file: frontend/Dockerfile
+context: https://github.com/studioqsrl/archiverse_v4.git#main
+git-access-token: $GITHUB_TOKEN
+verbose: true

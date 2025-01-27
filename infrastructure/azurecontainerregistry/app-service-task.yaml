@@ -1,0 +1,7 @@
+name: app-service-build
+registry: archiverseacr
+image: app-service:{{.Run.ID}}
+file: backend/app_service/Dockerfile
+context: https://github.com/studioqsrl/archiverse_v4.git#main
+git-access-token: $GITHUB_TOKEN
+verbose: true
