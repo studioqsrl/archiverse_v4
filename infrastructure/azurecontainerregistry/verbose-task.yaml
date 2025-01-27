@@ -1,0 +1,19 @@
+version: v1.1.0
+steps:
+  - build: >
+      -t {{.Run.Registry}}/frontend:{{.Run.ID}}
+      -f frontend/Dockerfile
+      --progress=plain
+      --no-cache
+      --verbose
+      .
+trigger:
+  baseImage:
+    enabled: false
+  sourceBranch:
+    enabled: false
+  pullRequest:
+    enabled: false
+  git:
+    enabled: false
+timeout: 3600
