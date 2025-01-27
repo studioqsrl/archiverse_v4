@@ -1,65 +1,101 @@
-import Link from "next/link"
+'use client'
 
-import { appClient } from "@/lib/auth0"
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
-import { Auth0Logo } from "@/components/auth0-logo"
+import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
 
-import { SignUpForm } from "./signup-form"
-import { WelcomeBackCard } from "./welcome-back-card"
-import { SubmitButton } from "@/components/submit-button"
+const fadeIn = {
+  hidden: { opacity: 0, y: 20, filter: "blur(10px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { 
+      duration: 1,
+      ease: [0.25, 0.1, 0, 1]
+    }
+  },
+  exit: {
+    opacity: 0,
+    y: -20,
+    filter: "blur(10px)",
+    transition: { 
+      duration: 0.8,
+      ease: [0.25, 0.1, 0, 1]
+    }
+  }
+}
 
-export default async function Home() {
-  const session = await appClient.getSession()
+const headerVariant = {
+  hidden: { opacity: 0, y: -20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { 
+      duration: 0.8,
+      delay: 0.2
+    }
+  }
+}
+
+export default function HomePage() {
+  const [showOriginal, setShowOriginal] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowOriginal(false)
+    }, 2000)
+    return () => clearTimeout(timer)
+  }, [])
 
   return (
-    <div className="container relative sm:grid h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-      {session ? (
-        <a
-          href="/api/auth/logout"
-          className={cn(
-            buttonVariants({ variant: "ghost" }),
-            "absolute right-4 top-4 md:right-8 md:top-8"
-          )}
+    <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-muted relative">
+      {/* Header with Login */}
+      <motion.div
+        variants={headerVariant}
+        initial="hidden"
+        animate="visible"
+        className="absolute top-0 right-0 p-6"
+      >
+        <Button
+          variant="ghost"
+          className="text-sm hover:bg-background/50"
+          asChild
         >
-          <SubmitButton>Logout</SubmitButton>
-        </a>
-      ) : (
-        <div
-          className="absolute right-4 top-4 md:right-8 md:top-8"
-        ><span className="text-sm">Already joined?</span> <a
-          className="text-sm underline"
-          href="/api/auth/login"
-        >
-          <SubmitButton>Log in</SubmitButton>
-        </a>
-        </div>
-      )}
+          <a href="/api/auth/login" className="text-muted-foreground hover:text-foreground transition-colors">
+            Login →
+          </a>
+        </Button>
+      </motion.div>
 
-      <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-        <div className="absolute inset-0 bg-black" />
-        <div className="relative z-20 flex items-center text-lg font-medium">
-          <Auth0Logo className="mr-2 size-8" />
-          <span className="font-semibold">SaaStart</span>
+      {/* Main Content */}
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <AnimatePresence mode="wait">
+            {showOriginal ? (
+              <motion.div
+                key="original"
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                variants={fadeIn}
+                className="text-4xl sm:text-7xl text-foreground/90 tracking-wider"
+              >
+                <span>ἀμείνονες</span>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="final"
+                initial="hidden"
+                animate="visible"
+                variants={fadeIn}
+                className="text-4xl sm:text-7xl text-transparent bg-clip-text bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 tracking-wider"
+              >
+                <span>εἴδη</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-        <div className="relative z-20 m-auto max-w-sm text-center">
-          <blockquote className="space-y-2">
-            <div className="space-y-8">
-              <p className="text-lg font-medium">
-                SaaStart is a reference B2B SaaS application built using Next.js
-                and Auth0 by Okta.
-              </p>
-              <p className="text-lg">
-                It features multi-tenancy support, user management and access
-                controls, security policies, self-service Single Sign-On
-                configuration and more out-of-the-box.
-              </p>
-            </div>
-          </blockquote>
-        </div>
-      </div>
-      <div className="lg:p-8 flex h-screen">
-        {session ? <WelcomeBackCard /> : <SignUpForm />}
       </div>
     </div>
   )

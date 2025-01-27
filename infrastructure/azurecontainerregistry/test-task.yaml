@@ -1,0 +1,12 @@
+version: v1.1.0
+steps:
+  - build: -t {{.Run.Registry}}/frontend:{{.Run.ID}} -f frontend/Dockerfile .
+trigger:
+  baseImage:
+    enabled: false
+  sourceBranch:
+    enabled: false
+  pullRequest:
+    enabled: false
+  git:
+    enabled: false

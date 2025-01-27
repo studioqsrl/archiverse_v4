@@ -2,18 +2,22 @@ import type { Metadata } from "next"
 
 import "./globals.css"
 
-import { Inter } from "next/font/google"
+import { Inter, GFS_Neohellenic } from "next/font/google"
 import Script from "next/script"
 
 import { Toaster } from "@/components/ui/sonner"
 import { ThemeProvider } from "@/components/theme-provider"
 
 const inter = Inter({ subsets: ["latin"] })
+const gfsNeohellenic = GFS_Neohellenic({ 
+  weight: "400",
+  subsets: ["greek"],
+  variable: "--font-greek"
+})
 
 export const metadata: Metadata = {
-  title: "SaaStart | Auth0 by Okta",
-  description:
-    "SaaStart is a reference B2B SaaS application built using Next.js and Auth0 by Okta.",
+  title: "ameides.com",
+  description: "Elevating Digital Experiences",
   metadataBase: new URL("https://saastart.app"),
 }
 
@@ -23,7 +27,7 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={inter.className} suppressHydrationWarning>
+    <html lang="en" className={`${inter.className} ${gfsNeohellenic.variable}`} suppressHydrationWarning>
       <body className="min-h-screen bg-background font-sans antialiased">
         <ThemeProvider
           attribute="class"
