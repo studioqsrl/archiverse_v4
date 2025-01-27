@@ -34,6 +34,14 @@ def get_db_connection():
 async def health_check():
     return {"status": "healthy"}
 
+@app.get("/version")
+async def version():
+    return {
+        "version": "1.0.0",
+        "name": "Archiverse App Service",
+        "environment": os.getenv("ENVIRONMENT", "development")
+    }
+
 @app.get("/api/data")
 async def get_data():
     conn = get_db_connection()
