@@ -13,12 +13,12 @@ RUN npm install -g npm@latest && \
     npm config set audit false
 
 # Install dependencies
-COPY package*.json ./
+COPY ./package*.json ./
 RUN npm ci && \
     npx update-browserslist-db@latest --yes
 
 # Build application
-COPY . .
+COPY ./ ./
 RUN npm run build
 
 # Production stage
