@@ -6,7 +6,6 @@ resources:
   - ingress.yaml
   - cert-manager.yaml
   - secret-provider-class.yaml
-  - node-pools.yaml
   # App Pool
   - app-pool/frontend.yaml
   - app-pool/api.yaml
