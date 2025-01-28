@@ -11,18 +11,6 @@ labels:
       environment: production
     includeSelectors: false
 
-configMapGenerator:
-  - name: postgres-config
-    namespace: archiverse
-    files:
-      - postgresql.conf
-
-secretGenerator:
-  - name: archiverse-secrets
-    namespace: archiverse
-    envs:
-      - .env
-
 images:
   - name: archiverseacr.azurecr.io/archiverse
     newTag: ec45db75f284630f856144624b5e69e1bfd9b27
