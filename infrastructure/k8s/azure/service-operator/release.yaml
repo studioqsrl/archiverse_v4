@@ -26,10 +26,10 @@ spec:
     crdPattern: "resources.azure.com/*;containerservice.azure.com/*;keyvault.azure.com/*;managedidentity.azure.com/*;eventhub.azure.com/*"
     image:
       repository: mcr.microsoft.com/k8s/azureserviceoperator
-      tag: v2.0.0-amd64
+      tag: v2.0.0
       os: linux
     preUpgradeChecker:
       image:
         repository: mcr.microsoft.com/k8s/azureserviceoperator
-        tag: v2.0.0-amd64
+        tag: v2.0.0
         os: linux
