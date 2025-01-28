@@ -10,7 +10,6 @@ az aks nodepool add \
   --node-vm-size Standard_B2ps_v2 \
   --kubernetes-version 1.30.7 \
   --zones 1 \
-  --enable-node-public-ip false \
   --max-pods 110 \
   --node-osdisk-size 64 \
   --labels nodepool=system-pool
@@ -25,7 +24,6 @@ az aks nodepool add \
   --node-vm-size Standard_B2ps_v2 \
   --kubernetes-version 1.30.7 \
   --zones 1 2 \
-  --enable-node-public-ip false \
   --max-pods 110 \
   --node-osdisk-size 64 \
   --labels nodepool=frontend-pool \
@@ -44,7 +42,6 @@ az aks nodepool add \
   --node-vm-size Standard_B2ps_v2 \
   --kubernetes-version 1.30.7 \
   --zones 1 2 \
-  --enable-node-public-ip false \
   --max-pods 110 \
   --node-osdisk-size 64 \
   --labels nodepool=backend-pool \
@@ -63,7 +60,6 @@ az aks nodepool add \
   --node-vm-size Standard_B2ps_v2 \
   --kubernetes-version 1.30.7 \
   --zones 1 \
-  --enable-node-public-ip false \
   --max-pods 110 \
   --node-osdisk-size 64 \
   --labels nodepool=db-pool \
