@@ -17,9 +17,9 @@ spec:
       nodeSelector:
         nodepool: db-pool
       tolerations:
-      - key: "dedicated"
+      - key: "workload"
         operator: "Equal"
-        value: "db-pool"
+        value: "postgres"
         effect: "NoSchedule"
       containers:
         - name: postgres
@@ -47,11 +47,11 @@ spec:
               readOnly: true
           resources:
             requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
               memory: "1Gi"
               cpu: "500m"
-            limits:
-              memory: "2Gi"
-              cpu: "1000m"
           livenessProbe:
             exec:
               command:

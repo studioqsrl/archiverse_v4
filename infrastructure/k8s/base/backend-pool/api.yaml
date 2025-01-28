@@ -13,7 +13,12 @@ spec:
         app: api
     spec:
       nodeSelector:
-        nodepool: app-pool
+        nodepool: backend-pool
+      tolerations:
+      - key: workload
+        operator: Equal
+        value: appservice
+        effect: NoSchedule
       imagePullSecrets:
       - name: acr-auth
       containers:
@@ -23,11 +28,11 @@ spec:
         - containerPort: 8000
         resources:
           requests:
-            cpu: 400m
-            memory: 512Mi
+            cpu: 100m
+            memory: 256Mi
           limits:
-            cpu: 1000m
-            memory: 1Gi
+            cpu: 500m
+            memory: 512Mi
         env:
         - name: POSTGRES_HOST
           value: postgres
