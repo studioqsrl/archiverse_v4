@@ -1,0 +1,22 @@
+apiVersion: management.azure.com/v1
+kind: AgentPool
+metadata:
+  name: dbpool
+spec:
+  type: VirtualMachineScaleSets
+  mode: User
+  count: 1
+  vmSize: Standard_B2ps_v2
+  orchestratorVersion: "1.30.7"
+  osDiskSizeGB: 64
+  osDiskType: Managed
+  osType: Linux
+  maxPods: 110
+  availabilityZones: ["1"]
+  enableAutoScaling: false
+  nodeLabels:
+    nodepool: db-pool
+  taints:
+    - key: workload
+      value: postgres
+      effect: NoSchedule

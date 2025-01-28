@@ -1,0 +1,9 @@
+apiVersion: management.azure.com/v1
+kind: AzureProviderConfig
+metadata:
+  name: azure-config
+spec:
+  subscriptionId: ${AZURE_SUBSCRIPTION_ID}
+  resourceGroup: archiverse
+  clusterName: archiverse
+  location: westeurope

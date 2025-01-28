@@ -1,0 +1,24 @@
+apiVersion: management.azure.com/v1
+kind: AgentPool
+metadata:
+  name: frontendpool
+spec:
+  type: VirtualMachineScaleSets
+  mode: User
+  count: 2
+  vmSize: Standard_B2ps_v2
+  orchestratorVersion: "1.30.7"
+  osDiskSizeGB: 64
+  osDiskType: Managed
+  osType: Linux
+  maxPods: 110
+  availabilityZones: ["1", "2"]
+  enableAutoScaling: true
+  minCount: 2
+  maxCount: 5
+  nodeLabels:
+    nodepool: frontend-pool
+  taints:
+    - key: workload
+      value: frontend
+      effect: NoSchedule
