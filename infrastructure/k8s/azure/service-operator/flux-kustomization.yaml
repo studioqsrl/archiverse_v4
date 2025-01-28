@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m
-  path: ./infrastructure/k8s/azure/service-operator
+  path: infrastructure/k8s/azure/service-operator
   prune: true
   sourceRef:
     kind: GitRepository
