@@ -1,15 +1,15 @@
 apiVersion: containerservice.azure.com/v1beta1
 kind: AgentPool
 metadata:
-  name: dbpool
-  namespace: azureserviceoperator-system
+  name: frontendpool
+  namespace: azure-service-operator-system
 spec:
   owner:
     name: archiverse
-    namespace: azureserviceoperator-system
+    namespace: azure-service-operator-system
   resourceGroup: archiverse
   agentPoolMode: User
-  count: 1
+  count: 2
   vmSize: Standard_B2ps_v2
   orchestratorVersion: "1.30.7"
   osDiskSizeGB: 64
@@ -17,10 +17,12 @@ spec:
   maxPods: 110
   availabilityZones:
     - "2"
-  enableAutoScaling: false
+  enableAutoScaling: true
+  minCount: 2
+  maxCount: 5
   nodeLabels:
-    nodepool: db-pool
+    nodepool: frontend-pool
   nodeTaints:
     - key: workload
-      value: postgres
+      value: frontend
       effect: NoSchedule

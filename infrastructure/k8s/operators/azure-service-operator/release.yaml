@@ -2,7 +2,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: azure-service-operator
-  namespace: azureserviceoperator-system
+  namespace: azure-service-operator-system
 spec:
   interval: 5m
   chart:

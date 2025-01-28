@@ -2,11 +2,11 @@ apiVersion: containerservice.azure.com/v1beta1
 kind: AgentPool
 metadata:
   name: backendpool
-  namespace: azureserviceoperator-system
+  namespace: azure-service-operator-system
 spec:
   owner:
     name: archiverse
-    namespace: azureserviceoperator-system
+    namespace: azure-service-operator-system
   resourceGroup: archiverse
   agentPoolMode: User
   count: 2

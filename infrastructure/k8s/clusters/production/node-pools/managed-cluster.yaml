@@ -2,7 +2,7 @@ apiVersion: containerservice.azure.com/v1beta1
 kind: ManagedCluster
 metadata:
   name: archiverse
-  namespace: azureserviceoperator-system
+  namespace: azure-service-operator-system
 spec:
   resourceGroup: archiverse
   location: westeurope
