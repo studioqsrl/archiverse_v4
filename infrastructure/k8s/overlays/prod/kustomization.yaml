@@ -11,9 +11,25 @@ labels:
       environment: production
     includeSelectors: false
 
+configMapGenerator:
+  - name: postgres-config
+    namespace: archiverse
+    files:
+      - postgresql.conf
+
+secretGenerator:
+  - name: archiverse-secrets
+    namespace: archiverse
+    envs:
+      - .env
+
 images:
-- name: archiverseacr.azurecr.io/archiverse
-  newTag: ec45db75f284630f856144624b5e69e1bfd9b27
+  - name: archiverseacr.azurecr.io/archiverse
+    newTag: ec45db75f284630f856144624b5e69e1bfd9b27
+  - name: archiverseacr.azurecr.io/app-service
+    newTag: ec45db75f284630f856144624b5e69e1bfd9b27
+  - name: postgres
+    newTag: "15.4"
 
 patches:
   - path: ingress-patch.yaml
@@ -21,38 +37,21 @@ patches:
       kind: Ingress
       name: archiverse
 
-  - patch: |-
-      - op: replace
-        path: /spec/template/spec/containers/0/resources/requests/cpu
-        value: 400m
-      - op: replace
-        path: /spec/template/spec/containers/0/resources/requests/memory
-        value: 512Mi
-      - op: replace
-        path: /spec/template/spec/containers/0/resources/limits/cpu
-        value: 1000m
-      - op: replace
-        path: /spec/template/spec/containers/0/resources/limits/memory
-        value: 1Gi
-      - op: replace
-        path: /spec/template/spec/containers/0/env/0/value
-        value: production
-      - op: add
-        path: /spec/template/spec/containers/0/readinessProbe
-        value:
-          httpGet:
-            path: /
-            port: 3000
-          initialDelaySeconds: 10
-          periodSeconds: 5
-      - op: add
-        path: /spec/template/spec/containers/0/livenessProbe
-        value:
-          httpGet:
-            path: /
-            port: 3000
-          initialDelaySeconds: 15
-          periodSeconds: 20
-    target:
-      kind: Deployment
-      name: archiverse
+commonAnnotations:
+  archiverse.io/environment: production
+  archiverse.io/secrets-checksum: ${SECRETS_CHECKSUM}
+
+replacements:
+  - source:
+      kind: Secret
+      name: archiverse-secrets
+      fieldPath: metadata.uid
+    targets:
+      - select:
+          kind: Deployment
+        fieldPaths:
+          - spec.template.metadata.annotations.checksum/secrets
+      - select:
+          kind: StatefulSet
+        fieldPaths:
+          - spec.template.metadata.annotations.checksum/secrets

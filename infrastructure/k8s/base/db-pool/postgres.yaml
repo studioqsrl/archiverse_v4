@@ -15,12 +15,12 @@ spec:
         app: postgres
     spec:
       nodeSelector:
-        workload: database
+        nodepool: db-pool
       tolerations:
-        - key: "database"
-          operator: "Equal"
-          value: "true"
-          effect: "NoSchedule"
+      - key: "dedicated"
+        operator: "Equal"
+        value: "db-pool"
+        effect: "NoSchedule"
       containers:
         - name: postgres
           image: postgres:15.4
@@ -47,11 +47,37 @@ spec:
               readOnly: true
           resources:
             requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
               memory: "2Gi"
               cpu: "1000m"
-            limits:
-              memory: "4Gi"
-              cpu: "2000m"
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - postgres
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - postgres
+            initialDelaySeconds: 15
+            periodSeconds: 5
+          startupProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - postgres
+            failureThreshold: 30
+            periodSeconds: 10
+      annotations:
+        checksum/secrets: ${SECRETS_CHECKSUM}
       volumes:
         - name: postgres-config
           configMap:
@@ -70,3 +96,44 @@ spec:
         resources:
           requests:
             storage: 10Gi
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-network-policy
+  namespace: archiverse
+spec:
+  podSelector:
+    matchLabels:
+      app: postgres
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: api
+    ports:
+    - protocol: TCP
+      port: 5432
+  egress:
+  - to:
+    - namespaceSelector: {}
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: archiverse
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress

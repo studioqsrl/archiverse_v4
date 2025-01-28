@@ -3,24 +3,18 @@ kind: Kustomization
 
 resources:
   - namespaces/archiverse.yaml
-  - deployment.yaml
   - ingress.yaml
   - cert-manager.yaml
   - secret-provider.yaml
-  - app-service.yaml
-  # - storage/cassandra/network-policy.yaml
-  # - storage/cassandra/service.yaml
-  # - storage/cassandra/statefulset.yaml
-  # - storage/cassandra/config/configmap.yaml
-  # - storage/janusgraph/network-policy.yaml
-  # - storage/janusgraph/service.yaml
-  # - storage/janusgraph/statefulset.yaml
-  # - storage/janusgraph/secret.yaml
-  # - storage/janusgraph/config/configmap.yaml
-  - storage/postgres/service.yaml
-  - storage/postgres/statefulset.yaml
-  - storage/postgres/config/configmap.yaml
-  - storage/postgres/serviceaccount.yaml
+  - node-pools.yaml
+  # App Pool
+  - app-pool/frontend.yaml
+  - app-pool/api.yaml
+  # DB Pool
+  - db-pool/postgres.yaml
+  - db-pool/service.yaml
+  - db-pool/service-account.yaml
+  - db-pool/config.yaml
 
 commonLabels:
   app.kubernetes.io/managed-by: flux

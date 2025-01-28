@@ -1,0 +1,42 @@
+apiVersion: containerservice.azure.com/v1
+kind: AgentPool
+metadata:
+  name: apppool
+  namespace: archiverse
+spec:
+  type: VirtualMachineScaleSets
+  mode: System
+  count: 3
+  vmSize: Standard_D2pls_v6
+  orchestratorVersion: "1.30.7"
+  osDiskSizeGB: 128
+  osType: Linux
+  maxPods: 110
+  availabilityZones: ["1", "2", "3"]
+  enableAutoScaling: false
+  nodeLabels:
+    nodepool: app-pool
+  nodeTaints: []
+---
+apiVersion: containerservice.azure.com/v1
+kind: AgentPool
+metadata:
+  name: dbpool
+  namespace: archiverse
+spec:
+  type: VirtualMachineScaleSets
+  mode: User
+  count: 1
+  vmSize: Standard_D2pls_v6
+  orchestratorVersion: "1.30.7"
+  osDiskSizeGB: 128
+  osType: Linux
+  maxPods: 110
+  availabilityZones: ["1"]
+  enableAutoScaling: false
+  nodeLabels:
+    nodepool: db-pool
+  nodeTaints:
+    - key: dedicated
+      value: db-pool
+      effect: NoSchedule

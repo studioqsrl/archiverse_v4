@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flux-system
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: archiverse
+  namespace: flux-system
+spec:
+  interval: 1m
+  url: https://github.com/studioqsrl/archiverse_v4
+  ref:
+    branch: main
+  secretRef:
+    name: github-credentials
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: archiverse-base-infra
+  namespace: flux-system
+spec:
+  interval: 1m
+  path: ./infrastructure/k8s/base
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: archiverse
+  components:
+    - secret-provider.yaml
+    - cert-manager.yaml
+    - ingress.yaml
+    - node-pools.yaml
+    - namespaces/archiverse.yaml
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: archiverse-base-apps
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: archiverse-base-infra
+  interval: 1m
+  path: ./infrastructure/k8s/base
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: archiverse
+  components:
+    - app-pool/frontend.yaml
+    - app-pool/api.yaml
+    - db-pool/postgres.yaml
+    - db-pool/service.yaml
+    - db-pool/service-account.yaml
+    - db-pool/config.yaml
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: archiverse-prod-apps
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: archiverse-base-apps
+  interval: 1m
+  path: ./infrastructure/k8s/overlays/prod
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: archiverse
+---
