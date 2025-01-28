@@ -27,19 +27,3 @@ patches:
 
 commonAnnotations:
   archiverse.io/environment: production
-  archiverse.io/secrets-checksum: ${SECRETS_CHECKSUM}
-
-replacements:
-  - source:
-      kind: Secret
-      name: archiverse-secrets
-      fieldPath: metadata.uid
-    targets:
-      - select:
-          kind: Deployment
-        fieldPaths:
-          - spec.template.metadata.annotations.checksum/secrets
-      - select:
-          kind: StatefulSet
-        fieldPaths:
-          - spec.template.metadata.annotations.checksum/secrets
