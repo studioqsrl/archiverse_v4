@@ -6,242 +6,191 @@ This directory contains the infrastructure configurations for the Enterprise Arc
 
 ```
 infrastructure/
-├── containers/           # Container management
-│   ├── README.md
-│   ├── acr-task.yaml
-│   ├── fix-issues.sh
-│   ├── monitor-deployment.sh
-│   ├── setup-acr-task.sh
-│   └── test-build.sh
-├── deployment/          # Continuous deployment
-│   ├── gotk-sync.yaml
-│   └── kustomization.yaml
-├── identity/           # Identity and access management
+├── azurecontainerregistry/  # Azure Container Registry configuration
+│   ├── app-service-task.yaml
+│   ├── frontend-task.yaml
+│   └── upload-tasks.sh
+├── identity/                # Identity and access management
 │   ├── README.md
 │   ├── README-ADVANCED.md
 │   └── delete-auth0-resources.py
-└── platform/          # Platform infrastructure
-    ├── base/          # Base configurations
-    │   ├── namespaces/
-    │   │   └── archiverse.yaml
-    │   ├── cert-manager.yaml
-    │   ├── deployment.yaml
-    │   ├── ingress.yaml
-    │   ├── kustomization.yaml
-    │   ├── secret-provider.yaml
-    │   ├── secrets.yaml
-    │   └── storage/   # Storage infrastructure
-    │       ├── cassandra/
-    │       │   ├── config/
-    │       │   │   └── configmap.yaml
-    │       │   ├── network-policy.yaml
-    │       │   ├── service.yaml
-    │       │   └── statefulset.yaml
-    │       └── janusgraph/
-    │           ├── config/
-    │           │   └── configmap.yaml
-    │           ├── network-policy.yaml
-    │           ├── secret.yaml
-    │           ├── service.yaml
-    │           └── statefulset.yaml
-    └── overlays/      # Environment-specific overrides
-        ├── dev/
-        │   ├── ingress-patch.yaml
-        │   ├── kustomization.yaml
-        │   └── secrets.yaml
-        ├── staging/
-        │   ├── ingress-patch.yaml
-        │   ├── kustomization.yaml
-        │   └── secrets.yaml
-        └── prod/
-            ├── ingress-patch.yaml
-            ├── kustomization.yaml
-            └── secrets.yaml
+├── k8s/                    # Kubernetes configurations
+│   ├── base/               # Base configurations
+│   │   ├── namespaces/
+│   │   │   └── archiverse.yaml
+│   │   ├── app-pool/      # Application services
+│   │   │   ├── api.yaml
+│   │   │   └── frontend.yaml
+│   │   ├── db-pool/       # Database configurations
+│   │   │   ├── config.yaml
+│   │   │   ├── postgres.yaml
+│   │   │   ├── service-account.yaml
+│   │   │   └── service.yaml
+│   │   ├── cert-manager.yaml
+│   │   ├── ingress.yaml
+│   │   ├── kustomization.yaml
+│   │   └── secret-provider-class.yaml
+│   └── overlays/          # Environment-specific overrides
+│       ├── dev/
+│       │   ├── ingress-patch.yaml
+│       │   ├── kustomization.yaml
+│       │   └── secrets.yaml
+│       ├── staging/
+│       │   ├── ingress-patch.yaml
+│       │   ├── kustomization.yaml
+│       │   └── secrets.yaml
+│       └── prod/
+│           ├── ingress-patch.yaml
+│           ├── kustomization.yaml
+│           └── secrets.yaml
+└── keyvault/              # Azure Key Vault configuration
+    └── secrets.yaml
 ```
 
-## Components
+## GitOps with Flux
 
-### Application Services
-- **App Service**: FastAPI-based service that provides PostgreSQL data access
-  - Deployed with the same node pool as frontend
-  - Internal cluster communication via Service
-  - Network policies for secure PostgreSQL access
-  - Health monitoring and Auth0 integration
+The infrastructure is managed using Flux, a GitOps tool that ensures the cluster state matches the desired state defined in this repository.
 
-### Container Management (/containers)
-- Container image build configurations
-- Azure Container Registry (ACR) tasks
-- Deployment monitoring
-- Build testing and issue resolution
+### Flux Bootstrap
 
-### Continuous Deployment (/deployment)
-- GitOps configurations using Flux
-- Automated synchronization
-- Deployment tracking
+To set up Flux with GitHub authentication:
 
-### Identity Management (/identity)
-- Authentication and authorization
-- User management
-- Resource access control
-- Advanced identity configurations
+```bash
+# Bootstrap Flux with GitHub authentication
+flux bootstrap github \
+  --token-auth \
+  --owner=studioqsrl \
+  --repository=archiverse_v4 \
+  --branch=main \
+  --path=infrastructure/k8s/overlays/prod \
+  --components-extra=image-reflector-controller,image-automation-controller
+```
 
-### Data Persistence (/persistence)
-- Database configurations and schemas
-- Data storage policies
-- Backup configurations
+This setup:
+- Uses GitHub token-based authentication
+- Monitors the main branch
+- Applies configurations from the production overlay
+- Includes image automation components for automated deployments
 
-### Platform Infrastructure (/platform)
-Core platform configurations organized into:
+### Key Components
 
-#### Base Configurations
+#### Base Configuration (/k8s/base)
 - Namespace definitions
-- Certificate management
+- Certificate management (cert-manager)
 - Ingress configurations
-- Secret management
-- Storage infrastructure:
-  - Cassandra cluster
-  - JanusGraph database
+- Secret provider integration
+- Application services configuration
+- Database configurations
 
-#### Environment Overlays
-- Development (dev)
-- Staging
-- Production (prod)
-Each with environment-specific:
-- Ingress configurations
-- Secret management
-- Resource limits
+#### Environment Overlays (/k8s/overlays)
+Each environment (dev, staging, prod) has specific configurations for:
+- Ingress settings
+- Environment-specific secrets
+- Resource limits and scaling
+- Image tags and versions
 
-## Storage Infrastructure
+## Azure Integration
 
-The storage layer is built on JanusGraph with Apache Cassandra as the backend storage engine.
+### Azure Container Registry
+- Automated build tasks
+- Image vulnerability scanning
+- Deployment monitoring
 
-### Cassandra
-- StatefulSet running Apache Cassandra 4.1
-- Configured for high availability with 3 replicas
-- Includes network policies for secure communication
-- Optimized for enterprise architecture workloads
-- Persistent storage with 100Gi per node
-- Resource limits: 4 CPU cores, 16Gi memory per node
+### Azure Key Vault
+- Secure secret management
+- Integration with Kubernetes via CSI driver
+- Managed identity authentication
 
-### JanusGraph
-- StatefulSet running JanusGraph latest version
-- Configured for high availability with 3 replicas
-- Optimized cache and transaction settings
-- Secure communication with Cassandra backend
-- Persistent storage with 50Gi per node
-- Resource limits: 4 CPU cores, 8Gi memory per node
+## Application Components
+
+### Frontend Service
+- Next.js-based web application
+- Deployed in the app pool
+- Exposed via Azure Application Gateway ingress
+
+### API Service
+- FastAPI-based backend service
+- Internal cluster communication
+- Secure database access
+- Health monitoring and Auth0 integration
+
+### Database
+- PostgreSQL database
+- Dedicated node pool
+- Automated backups
+- Resource isolation
 
 ## Security Features
 
-1. Network Policies
-   - Restricted pod-to-pod communication
-   - Isolated Cassandra cluster access
-   - Controlled external access to JanusGraph
+1. Network Security
+   - Pod-to-pod communication policies
+   - Ingress traffic control
+   - Secure service communication
 
-2. Authentication
-   - Cassandra authentication enabled
-   - Credentials managed via Kubernetes secrets
-   - Secure password storage
-   - Identity provider integration
+2. Authentication & Authorization
+   - Auth0 integration
+   - Azure AD integration
+   - RBAC policies
 
-## Deployment Instructions
+3. Secret Management
+   - Azure Key Vault integration
+   - CSI secret provider
+   - Secure credential rotation
 
-1. Create the namespace:
+## Deployment Process
+
+The GitOps workflow ensures automated deployment:
+
+1. Changes are committed to the repository
+2. Flux detects changes and reconciles the cluster state
+3. Changes are applied based on the environment overlay
+4. Status can be checked using Flux commands:
    ```bash
-   kubectl apply -f platform/base/namespaces/archiverse.yaml
+   # Check Flux status
+   flux get kustomizations
+   
+   # Check sources
+   flux get sources git
+   
+   # Check reconciliation
+   flux get all
    ```
-
-2. Deploy Cassandra:
-   ```bash
-   kubectl apply -f platform/base/storage/cassandra/
-   ```
-   Wait for all Cassandra pods to be ready:
-   ```bash
-   kubectl rollout status statefulset/cassandra
-   ```
-
-3. Deploy JanusGraph:
-   ```bash
-   # First update the cassandra-credentials secret with secure passwords
-   kubectl apply -f platform/base/storage/janusgraph/
-   ```
-   Wait for all JanusGraph pods to be ready:
-   ```bash
-   kubectl rollout status statefulset/janusgraph
-   ```
-
-4. Deploy App Service:
-   ```bash
-   kubectl apply -f platform/base/app-service.yaml
-   ```
-   Wait for the app service to be ready:
-   ```bash
-   kubectl rollout status deployment/app-service
-   ```
-
-## Environment Management
-
-The infrastructure supports multiple environments through Kustomize overlays:
-
-- `platform/overlays/dev/` - Development environment
-- `platform/overlays/staging/` - Staging environment
-- `platform/overlays/prod/` - Production environment
-
-Each environment has its own:
-- Ingress configurations
-- Secret management
-- Resource limits and scaling parameters
-
-## Continuous Deployment
-
-GitOps-based continuous deployment:
-1. Infrastructure changes are committed to the repository
-2. Flux automatically synchronizes the changes
-3. Changes are applied to the cluster based on environment
-
-## Container Management
-
-Container lifecycle management:
-1. Automated builds via ACR tasks
-2. Image vulnerability scanning
-3. Deployment monitoring
-4. Issue resolution scripts
 
 ## Monitoring
 
-Monitor the health of your infrastructure:
+Monitor infrastructure health:
 
 ```bash
-# Check Cassandra cluster status
-kubectl exec cassandra-0 -- nodetool status
+# Check pod status
+kubectl get pods -n archiverse
 
-# Check JanusGraph pods
-kubectl get pods -l app=janusgraph
+# View application logs
+kubectl logs -l app=frontend -n archiverse
+kubectl logs -l app=api -n archiverse
 
-# Monitor deployments
-./containers/monitor-deployment.sh
+# Check services
+kubectl get services -n archiverse
 
-# Check App Service status
-kubectl get pods -l app=app-service
-kubectl logs -l app=app-service
-kubectl get service app-service
+# Monitor ingress
+kubectl get ingress -n archiverse
 ```
 
 ## Best Practices
 
-1. Always maintain at least 3 replicas for high availability
-2. Monitor disk usage and scale storage as needed
-3. Regularly update security credentials
-4. Keep JanusGraph and Cassandra versions in sync
-5. Implement regular backup procedures
-6. Monitor performance metrics and adjust resources accordingly
-7. Use environment overlays for configuration differences
-8. Follow GitOps workflow for infrastructure changes
+1. Follow GitOps workflow for all infrastructure changes
+2. Use environment overlays for configuration differences
+3. Keep secrets in Azure Key Vault
+4. Regularly update security credentials
+5. Monitor resource usage and scale as needed
+6. Implement regular backup procedures
+7. Use proper tagging for all resources
+8. Maintain documentation for configuration changes
 
 ## Support
 
-For issues or questions:
-1. Check pod logs: `kubectl logs <pod-name>`
-2. Review events: `kubectl get events`
-3. Consult component-specific documentation
-4. Use provided monitoring and debugging scripts
+For troubleshooting:
+1. Check pod logs: `kubectl logs <pod-name> -n archiverse`
+2. Review events: `kubectl get events -n archiverse`
+3. Check Flux status: `flux get all`
+4. Verify Azure resources in portal
+5. Review application logs in Azure Monitor
