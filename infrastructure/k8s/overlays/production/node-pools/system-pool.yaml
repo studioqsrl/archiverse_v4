@@ -1,0 +1,15 @@
+apiVersion: containerservice.azure.com/v1beta1
+kind: AgentPool
+metadata:
+  name: systempool
+  namespace: azure-service-operator-system
+spec:
+  managedClusterName: archiverse
+  mode: System
+  count: 1
+  vmSize: Standard_B2ps_v2
+  availabilityZones:
+    - "2"
+  maxPods: 110
+  osDiskSizeGB: 64
+  osType: Linux
