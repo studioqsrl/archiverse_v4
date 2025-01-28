@@ -19,3 +19,6 @@ spec:
     azureTenantID: ${AZURE_TENANT_ID}
     azureClientID: ${AZURE_CLIENT_ID}
     azureClientSecret: ${AZURE_CLIENT_SECRET}
+    certManager:
+      enabled: true
+      apiVersion: cert-manager.io/v1
