@@ -20,5 +20,7 @@ spec:
     azureClientID: ${AZURE_CLIENT_ID}
     azureClientSecret: ${AZURE_CLIENT_SECRET}
     certManager:
-      enabled: true
-      apiVersion: cert-manager.io/v1
+      enabled: false
+    webhook:
+      certificate:
+        generate: true
