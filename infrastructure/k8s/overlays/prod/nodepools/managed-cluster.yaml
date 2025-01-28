@@ -1,0 +1,23 @@
+apiVersion: containerservice.azure.com/v1beta1
+kind: ManagedCluster
+metadata:
+  name: archiverse
+  namespace: azureserviceoperator-system
+spec:
+  resourceGroup: archiverse
+  location: westeurope
+  version: "1.30.7"
+  networkProfile:
+    networkPlugin: azure
+  identity:
+    type: SystemAssigned
+  agentPoolProfiles:
+    - name: systempool
+      mode: System
+      count: 1
+      vmSize: Standard_B2ps_v2
+      availabilityZones:
+        - "2"
+      maxPods: 110
+      osDiskSizeGB: 64
+      osType: Linux

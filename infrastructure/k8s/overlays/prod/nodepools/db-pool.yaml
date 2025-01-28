@@ -1,18 +1,22 @@
-apiVersion: containerservice.azure.com/v1
+apiVersion: containerservice.azure.com/v1beta1
 kind: AgentPool
 metadata:
   name: dbpool
-  namespace: archiverse
+  namespace: azureserviceoperator-system
 spec:
-  type: VirtualMachineScaleSets
-  mode: User
+  owner:
+    name: archiverse
+    namespace: azureserviceoperator-system
+  resourceGroup: archiverse
+  agentPoolMode: User
   count: 1
   vmSize: Standard_B2ps_v2
   orchestratorVersion: "1.30.7"
   osDiskSizeGB: 64
   osType: Linux
   maxPods: 110
-  availabilityZones: ["2"]
+  availabilityZones:
+    - "2"
   enableAutoScaling: false
   nodeLabels:
     nodepool: db-pool

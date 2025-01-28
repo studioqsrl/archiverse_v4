@@ -1,0 +1,13 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: azure-service-operator
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://raw.githubusercontent.com/Azure/azure-service-operator/main/charts
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: azureserviceoperator-system
