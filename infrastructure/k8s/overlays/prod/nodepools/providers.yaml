@@ -1,4 +1,4 @@
-apiVersion: management.azure.com/v1
+apiVersion: clusterconfig.azure.com/v1
 kind: AzureProviderConfig
 metadata:
   name: azure-config
