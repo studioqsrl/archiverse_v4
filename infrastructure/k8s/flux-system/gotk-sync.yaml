@@ -11,7 +11,7 @@ spec:
     branch: main
   secretRef:
     name: flux-system
-  url: https://github.com/studioqsrl/archiverse_v4.git
+  url: ssh://git@github.com/studioqsrl/archiverse_v4
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
