@@ -5,8 +5,6 @@ metadata:
   namespace: azureserviceoperator-system
 spec:
   owner:
-    group: containerservice.azure.com
-    kind: ManagedCluster
     name: archiverse
   mode: User
   count: 2
