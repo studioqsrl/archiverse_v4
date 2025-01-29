@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: archiverse
+spec:
+  template:
+    spec:
+      containers:
+      - name: app-pool
+        image: archiverseacr.azurecr.io/frontend:v1.0.0  # Will be updated manually via PRs

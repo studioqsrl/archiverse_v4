@@ -5,3 +5,6 @@ resources:
 - ../../base
 - managed-cluster.yaml
 - node-pools
+
+patches:
+- path: patches/frontend-image.yaml

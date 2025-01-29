@@ -3,5 +3,7 @@ kind: Kustomization
 
 resources:
 - ../../base
+- configs/frontend-automation.yaml
 
-patches: []
+patches:
+- path: patches/frontend-image.yaml
