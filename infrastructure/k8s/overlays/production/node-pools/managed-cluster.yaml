@@ -13,3 +13,5 @@ spec:
     networkPlugin: azure
   owner:
     name: archiverse
+    group: resources.azure.com
+    kind: ResourceGroup
