@@ -19,9 +19,20 @@ spec:
         operator: Equal
         value: frontend
         effect: NoSchedule
+      volumes:
+      - name: secrets-store
+        csi:
+          driver: secrets-store.csi.x-k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: archiverse-frontend-secrets
       containers:
       - name: app-pool
         image: archiverseacr.azurecr.io/frontend # Base image, tag will be set by environment overlays
+        volumeMounts:
+        - name: secrets-store
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
         ports:
         - containerPort: 3000
         resources:
