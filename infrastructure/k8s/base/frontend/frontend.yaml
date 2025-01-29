@@ -27,7 +27,7 @@ spec:
           driver: secrets-store.csi.x-k8s.io
           readOnly: true
           volumeAttributes:
-            secretProviderClass: archiverse-frontend-secrets
+            secretProviderClass: archiverse-kv-secrets
       containers:
       - name: app-pool
         image: archiverseacr.azurecr.io/frontend # Base image, tag will be set by environment overlays
