@@ -15,12 +15,11 @@ spec:
     spec:
       serviceAccountName: frontend-sa
       nodeSelector:
-        nodepool: frontend-pool
+        workload: frontend
       tolerations:
-      - key: "workload"
-        operator: "Equal"
-        value: "frontend"
-        effect: "NoSchedule"
+      - key: workload
+        value: frontend
+        effect: NoSchedule
       containers:
       - name: app-pool
         image: archiverseacr.azurecr.io/frontend # Base image, tag will be set by environment overlays
