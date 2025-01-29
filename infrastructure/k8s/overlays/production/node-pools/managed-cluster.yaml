@@ -1,0 +1,14 @@
+apiVersion: containerservice.azure.com/v1api20210501
+kind: ManagedCluster
+metadata:
+  name: archiverse
+  namespace: azureserviceoperator-system
+spec:
+  location: westeurope
+  resourceGroup: archiverse
+  properties:
+    kubernetesVersion: "1.27"
+    dnsPrefix: "archiverse"
+    agentPoolProfiles: []
+    networkProfile:
+      networkPlugin: azure
