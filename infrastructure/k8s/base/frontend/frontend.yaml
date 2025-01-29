@@ -12,6 +12,7 @@ spec:
       labels:
         app: frontend
     spec:
+      serviceAccountName: frontend-sa
       nodeSelector:
         agentpool: frontendpool
       tolerations:
