@@ -6,6 +6,7 @@ metadata:
   annotations:
     appgw.ingress.kubernetes.io/ssl-redirect: "true"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    appgw.ingress.kubernetes.io/appgw-ssl-certificate: "archiverse-studioq-tls"
 spec:
   ingressClassName: azure-application-gateway
   tls:
