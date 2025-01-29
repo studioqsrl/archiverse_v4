@@ -5,10 +5,11 @@ metadata:
   namespace: azureserviceoperator-system
 spec:
   location: westeurope
-  resourceGroup: archiverse
-  properties:
-    kubernetesVersion: "1.27"
-    dnsPrefix: "archiverse"
-    agentPoolProfiles: []
-    networkProfile:
-      networkPlugin: azure
+  nodeResourceGroup: archiverse
+  kubernetesVersion: "1.27"
+  dnsPrefix: "archiverse"
+  agentPoolProfiles: []
+  networkProfile:
+    networkPlugin: azure
+  owner:
+    name: archiverse
