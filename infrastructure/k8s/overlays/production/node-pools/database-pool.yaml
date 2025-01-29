@@ -4,7 +4,8 @@ metadata:
   name: databasepool
   namespace: azureserviceoperator-system
 spec:
-  managedClusterName: archiverse
+  owner:
+    name: archiverse
   mode: User
   count: 1
   vmSize: Standard_D2pls_v6
