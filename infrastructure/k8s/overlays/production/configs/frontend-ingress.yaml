@@ -5,8 +5,13 @@ metadata:
   namespace: archiverse
   annotations:
     appgw.ingress.kubernetes.io/backend-protocol: "http"
+    appgw.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   ingressClassName: azure-application-gateway
+  tls:
+  - hosts:
+    - archiverse.studioq.biz
+    secretName: archiverse-studioq-tls
   rules:
   - host: archiverse.studioq.biz
     http:
