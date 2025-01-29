@@ -1,9 +1,12 @@
 # syntax=docker/dockerfile:1
 
 # Build stage
-FROM --platform=$BUILDPLATFORM node:20-alpine AS builder
+FROM arm64v8/alpine AS builder
 
 WORKDIR /app
+
+# Install Node.js and npm
+RUN apk add --no-cache nodejs npm
 
 # Configure npm and Next.js
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -21,8 +24,12 @@ COPY frontend/ ./
 RUN npm run build
 
 # Production stage
-FROM --platform=linux/arm64 node:20-alpine AS runner
+FROM arm64v8/alpine AS runner
+
 WORKDIR /app
+
+# Install Node.js
+RUN apk add --no-cache nodejs npm
 
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1
