@@ -4,16 +4,9 @@ metadata:
   name: frontend-ingress
   namespace: archiverse
   annotations:
-    appgw.ingress.kubernetes.io/ssl-redirect: "true"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    appgw.ingress.kubernetes.io/use-private-ip: "false"
     appgw.ingress.kubernetes.io/backend-protocol: "http"
 spec:
   ingressClassName: azure-application-gateway
-  tls:
-  - hosts:
-    - archiverse.studioq.biz
-    secretName: archiverse-studioq-tls
   rules:
   - host: archiverse.studioq.biz
     http:

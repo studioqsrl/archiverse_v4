@@ -5,6 +5,7 @@ resources:
 - ../../base
 - configs/frontend-repository.yaml
 - configs/frontend-ingress.yaml
+- configs/frontend-certificate.yaml
 # Node pools are managed directly through Azure CLI
 # - node-pools
 
