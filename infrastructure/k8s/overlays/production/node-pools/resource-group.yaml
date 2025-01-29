@@ -5,3 +5,7 @@ metadata:
   namespace: azureserviceoperator-system
 spec:
   location: westeurope
+  operatorSpec:
+    secretExpressions:
+    - name: azure-service-operator
+      key: AZURE_SUBSCRIPTION_ID
