@@ -13,7 +13,7 @@ spec:
         app: frontend
     spec:
       nodeSelector:
-        nodepool: frontend-pool
+        agentpool: frontendpool
       tolerations:
       - key: workload
         operator: Equal
