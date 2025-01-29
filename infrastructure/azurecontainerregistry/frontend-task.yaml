@@ -1,13 +1,15 @@
 version: v1.1.0
+stepTimeout: 28800
 steps:
-  - build: -t $Registry/frontend:$ID -t $Registry/frontend:latest -f frontend/Dockerfile .
+  - id: build
+    build: -t {{.Run.Registry}}/frontend:{{.Run.ID}} -t {{.Run.Registry}}/frontend:latest -f frontend/Dockerfile .
     workingDirectory: .
-trigger:
-  when:
-    - sourcePath:
-        - "frontend/**"
-        - "package.json"
-        - "package-lock.json"
+    ignoreErrors: false
+    when:
+      - sourcePath:
+          - "frontend/**"
+          - "package.json"
+          - "package-lock.json"
 platform:
   os: Linux
   architecture: arm64
