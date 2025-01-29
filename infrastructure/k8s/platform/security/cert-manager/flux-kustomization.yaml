@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m0s
-  path: ./infrastructure/k8s/operators/cert-manager
+  path: ./infrastructure/k8s/platform/security/cert-manager
   prune: true
   sourceRef:
     kind: GitRepository
