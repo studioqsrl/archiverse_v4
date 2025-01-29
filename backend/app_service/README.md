@@ -50,3 +50,4 @@ docker run -p 8000:8000 app-service
 ## Deployment
 
 The service is deployed to Kubernetes using the configuration in `infrastructure/k8s/base/app-service.yaml`. It uses the same node pool as the frontend service and communicates with PostgreSQL through internal cluster networking.
+# Test comment

@@ -21,6 +21,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: archiverse
+            name: frontend
             port:
               number: 80  # Using 80 since our Service maps 80->3000
