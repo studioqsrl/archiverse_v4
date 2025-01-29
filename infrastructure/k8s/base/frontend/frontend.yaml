@@ -11,6 +11,7 @@ spec:
     metadata:
       labels:
         app: frontend
+        azure.workload.identity/use: "true"
     spec:
       serviceAccountName: frontend-sa
       nodeSelector:
