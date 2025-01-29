@@ -14,20 +14,13 @@ spec:
         azure.workload.identity/use: "true"
     spec:
       serviceAccountName: frontend-sa
-      nodeSelector:
-        agentpool: frontendpool
-      tolerations:
-      - key: workload
-        operator: Equal
-        value: frontend
-        effect: NoSchedule
       volumes:
       - name: secrets-store
         csi:
           driver: secrets-store.csi.x-k8s.io
           readOnly: true
           volumeAttributes:
-            secretProviderClass: archiverse-kv-secrets
+            secretProviderClass: archiverse-frontend-secrets
       containers:
       - name: app-pool
         image: archiverseacr.azurecr.io/frontend # Base image, tag will be set by environment overlays
@@ -65,7 +58,7 @@ spec:
         - name: SESSION_ENCRYPTION_SECRET
           valueFrom:
             secretKeyRef:
-              name: archiverse-kv-secrets
+              name: archiverse-frontend-secrets
               key: SESSION_ENCRYPTION_SECRET
         - name: AUTH0_CLIENT_ID
           valueFrom:
@@ -75,7 +68,7 @@ spec:
         - name: AUTH0_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
-              name: archiverse-kv-secrets
+              name: archiverse-frontend-secrets
               key: AUTH0_CLIENT_SECRET
         - name: AUTH0_MANAGEMENT_CLIENT_ID
           valueFrom:
@@ -85,7 +78,7 @@ spec:
         - name: AUTH0_MANAGEMENT_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
-              name: archiverse-kv-secrets
+              name: archiverse-frontend-secrets
               key: AUTH0_MANAGEMENT_CLIENT_SECRET
         - name: AUTH0_ADMIN_ROLE_ID
           valueFrom:
