@@ -23,9 +23,11 @@ az acr task create \
   --name "frontend-build" \
   --registry "archiverseacr" \
   --context "https://github.com/studioqsrl/archiverse_v4.git#main" \
-  --file "infrastructure/azurecontainerregistry/frontend-task.yaml" \
+  --file "frontend/Dockerfile" \
   --git-access-token "${GITHUB_TOKEN}" \
   --commit-trigger-enabled true \
+  --platform "linux/arm64/v8" \
+  --image "frontend:{{.Run.ID}}" \
   --verbose
 
 # App Service task

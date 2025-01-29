@@ -16,4 +16,3 @@ steps:
 platform:
   os: Linux
   architecture: arm64
-  variant: v8
