@@ -12,3 +12,4 @@ resources:
 patches:
 - path: patches/frontend-image.yaml
 - path: patches/app-service-image.yaml
+- path: patches/api-network-policy.yaml
