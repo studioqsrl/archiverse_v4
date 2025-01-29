@@ -1,4 +1,4 @@
-apiVersion: containerservice.azure.com/v1api20210501
+apiVersion: containerservice.azure.com/v1api20240801
 kind: ManagedClustersAgentPool
 metadata:
   name: databasepool
@@ -9,11 +9,20 @@ spec:
   mode: User
   count: 1
   vmSize: Standard_D2pls_v6
-  availabilityZones:
-    - "2"
-  maxPods: 110
+  maxPods: 30
   osDiskSizeGB: 512
   osType: Linux
+  osDiskType: Managed
+  kubeletDiskType: OS
+  type: VirtualMachineScaleSets
+  enableAutoScaling: false
+  scaleDownMode: Delete
+  osSKU: Ubuntu
+  upgradeSettings: {}
+  enableFIPS: false
+  securityProfile:
+    enableVTPM: false
+    enableSecureBoot: false
   nodeTaints:
     - "workload=database:NoSchedule"
   nodeLabels:
