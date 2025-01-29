@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
 - ../../base
 - configs/frontend-repository.yaml
+- configs/frontend-ingress.yaml
 # Node pools are managed directly through Azure CLI
 # - node-pools
 
