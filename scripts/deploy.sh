@@ -70,26 +70,39 @@ git add .
 git commit -m "Update frontend" || true
 git push
 
-# Monitor ACR build
-echo "Monitoring ACR build..."
-new_image_id=$(wait_for_acr_run "frontend-build")
+# Monitor frontend build
+echo "Monitoring frontend build..."
+frontend_image_id=$(wait_for_acr_run "frontend-build")
 
-# Update the production overlay
-echo "Updating production overlay with new image ID..."
-overlay_path="infrastructure/k8s/overlays/production/patches/frontend-image.yaml"
+# Monitor backend build
+echo "Monitoring backend build..."
+backend_image_id=$(wait_for_acr_run "app-service-build")
 
-if [ ! -f "$overlay_path" ]; then
-    echo "Error: Overlay file not found at $overlay_path"
+# Update the production overlays
+echo "Updating production overlays with new image IDs..."
+
+# Update frontend image
+frontend_overlay="infrastructure/k8s/overlays/production/patches/frontend-image.yaml"
+if [ ! -f "$frontend_overlay" ]; then
+    echo "Error: Frontend overlay file not found at $frontend_overlay"
     exit 1
 fi
+echo "Updating frontend image tag..."
+sed -i '' "s|archiverseacr.azurecr.io/frontend:.*|archiverseacr.azurecr.io/frontend:${frontend_image_id}|g" "$frontend_overlay"
 
-echo "Updating image tag in $overlay_path..."
-sed -i '' "s|archiverseacr.azurecr.io/frontend:.*|archiverseacr.azurecr.io/frontend:${new_image_id}|g" "$overlay_path"
+# Update backend image
+backend_overlay="infrastructure/k8s/overlays/production/patches/app-service-image.yaml"
+if [ ! -f "$backend_overlay" ]; then
+    echo "Error: Backend overlay file not found at $backend_overlay"
+    exit 1
+fi
+echo "Updating backend image tag..."
+sed -i '' "s|archiverseacr.azurecr.io/app-service:.*|archiverseacr.azurecr.io/app-service:${backend_image_id}|g" "$backend_overlay"
 
-# Commit and push the overlay update
-echo "Committing and pushing overlay update..."
-git add "$overlay_path"
-git commit -m "Update frontend image to ${new_image_id}"
+# Commit and push the overlay updates
+echo "Committing and pushing overlay updates..."
+git add "$frontend_overlay" "$backend_overlay"
+git commit -m "Update frontend image to ${frontend_image_id} and backend image to ${backend_image_id}"
 git push
 
 # Flux sync
