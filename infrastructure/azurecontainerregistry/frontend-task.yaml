@@ -1,5 +1,10 @@
 version: v1.1.0
 stepTimeout: 28800
+trigger:
+  sourcePath:
+    - "frontend/**"
+    - "package.json"
+    - "package-lock.json"
 steps:
   - build: >
       -t {{.Run.Registry}}/frontend:{{.Run.ID}}
@@ -8,11 +13,6 @@ steps:
       .
     workingDirectory: .
     id: build
-    when:
-      - sourcePath:
-          - "frontend/**"
-          - "package.json"
-          - "package-lock.json"
 platform:
   os: Linux
   architecture: arm64
