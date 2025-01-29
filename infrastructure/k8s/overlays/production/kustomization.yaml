@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
 - ../../base
+- configs/frontend-repository.yaml
 # Node pools are managed directly through Azure CLI
 # - node-pools
 
