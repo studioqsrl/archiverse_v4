@@ -8,4 +8,4 @@ spec:
     spec:
       containers:
       - name: app-pool
-        image: archiverseacr.azurecr.io/frontend:cb85  # Using specific Run.ID tag for immutable reference
+        image: archiverseacr.azurecr.io/frontend:cb8r  # Using specific Run.ID tag for immutable reference

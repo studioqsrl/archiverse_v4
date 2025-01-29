@@ -22,8 +22,8 @@ echo "Creating frontend task..."
 az acr task create \
   --name "frontend-build" \
   --registry "archiverseacr" \
-  --context "https://github.com/studioqsrl/archiverse_v4.git#main:frontend" \
-  --file "Dockerfile" \
+  --context "https://github.com/studioqsrl/archiverse_v4.git#main" \
+  --file "frontend/Dockerfile" \
   --git-access-token "${GITHUB_TOKEN}" \
   --commit-trigger-enabled true \
   --platform "linux/arm64/v8" \
@@ -40,6 +40,7 @@ az acr task create \
   --context "https://github.com/studioqsrl/archiverse_v4.git#main" \
   --git-access-token "${GITHUB_TOKEN}" \
   --commit-trigger-enabled true \
+  --platform "linux/arm64/v8" \
   --verbose
 
 echo "All tasks have been created successfully!"

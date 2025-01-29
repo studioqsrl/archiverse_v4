@@ -44,7 +44,7 @@ export default function HomePage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowOriginal(false)
-    }, 2000)
+    }, 3000) // Increased duration for better readability
     return () => clearTimeout(timer)
   }, [])
 
@@ -59,11 +59,11 @@ export default function HomePage() {
       >
         <Button
           variant="ghost"
-          className="text-sm hover:bg-background/50"
+          className="text-sm font-medium hover:bg-background/50"
           asChild
         >
           <a href="/api/auth/login" className="text-muted-foreground hover:text-foreground transition-colors">
-            Login →
+            Sign In →
           </a>
         </Button>
       </motion.div>
@@ -81,17 +81,30 @@ export default function HomePage() {
                 variants={fadeIn}
                 className="text-4xl sm:text-7xl text-foreground/90 tracking-wider"
               >
-                <span>ἀμείνονες</span>
+                <span>ἀμείνονες εἴδη</span>
               </motion.div>
             ) : (
               <motion.div
                 key="final"
                 initial="hidden"
                 animate="visible"
+                exit="exit"
                 variants={fadeIn}
-                className="text-4xl sm:text-7xl text-transparent bg-clip-text bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 tracking-wider"
+                className="space-y-6"
               >
-                <span>εἴδη</span>
+                <h1 className="text-4xl sm:text-6xl font-light text-foreground/90">
+                  Archiverse
+                </h1>
+                <p className="text-lg text-muted-foreground max-w-[600px] mx-auto px-4">
+                  Secure your digital realm with enterprise-grade authentication
+                </p>
+                <div className="pt-4">
+                  <Button asChild size="lg">
+                    <a href="/api/auth/login">
+                      Get Started
+                    </a>
+                  </Button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -100,5 +113,3 @@ export default function HomePage() {
     </div>
   )
 }
-// Test comment
-// Test comment
