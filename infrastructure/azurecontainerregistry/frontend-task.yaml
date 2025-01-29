@@ -1,6 +1,6 @@
 name: frontend-build
 registry: archiverseacr
-image: frontend:{{.Run.ID}}
+image: frontend:{{.Run.ID}},frontend:latest
 file: frontend/Dockerfile
 context: https://github.com/studioqsrl/archiverse_v4.git#main
 git-access-token: $GITHUB_TOKEN

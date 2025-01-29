@@ -1,4 +1,4 @@
-apiVersion: containerservice.azure.com/v1api20240801
+apiVersion: containerservice.azure.com/v1
 kind: ManagedClustersAgentPool
 metadata:
   name: frontendpool
