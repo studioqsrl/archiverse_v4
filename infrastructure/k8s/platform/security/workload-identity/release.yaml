@@ -1,0 +1,28 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: azure-workload-identity
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://azure.github.io/azure-workload-identity/charts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: workload-identity-webhook
+  namespace: azure-workload-identity-system
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: workload-identity-webhook
+      version: "1.1.0"
+      sourceRef:
+        kind: HelmRepository
+        name: azure-workload-identity
+        namespace: flux-system
+  install:
+    createNamespace: true
+  values:
+    azureTenantID: "24f581d7-7de0-4de5-b81a-27051d6e1be0"
