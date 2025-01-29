@@ -1,0 +1,22 @@
+apiVersion: containerservice.azure.com/v1api20210501
+kind: ManagedClustersAgentPool
+metadata:
+  name: databasepool
+  namespace: azureserviceoperator-system
+spec:
+  managedClusterName: archiverse
+  mode: User
+  count: 1
+  vmSize: Standard_D2pls_v6
+  availabilityZones:
+    - "2"
+  maxPods: 110
+  osDiskSizeGB: 512
+  osType: Linux
+  nodeTaints:
+    - key: "workload"
+      value: "database"
+      effect: "NoSchedule"
+  nodeLabels:
+    workload: database
+    persistence: "true"

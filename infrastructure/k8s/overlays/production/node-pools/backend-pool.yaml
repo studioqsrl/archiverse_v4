@@ -1,0 +1,21 @@
+apiVersion: containerservice.azure.com/v1api20210501
+kind: ManagedClustersAgentPool
+metadata:
+  name: backendpool
+  namespace: azureserviceoperator-system
+spec:
+  managedClusterName: archiverse
+  mode: User
+  count: 2
+  vmSize: Standard_D2pls_v6
+  availabilityZones:
+    - "2"
+  maxPods: 110
+  osDiskSizeGB: 128
+  osType: Linux
+  nodeTaints:
+    - key: "workload"
+      value: "backend"
+      effect: "NoSchedule"
+  nodeLabels:
+    workload: backend
