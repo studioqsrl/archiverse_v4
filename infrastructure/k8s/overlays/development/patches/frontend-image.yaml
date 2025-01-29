@@ -8,4 +8,4 @@ spec:
     spec:
       containers:
       - name: app-pool
-        image: archiverseacr.azurecr.io/frontend:latest # {"$imagepolicy": "flux-system:frontend"}
+        image: archiverseacr.azurecr.io/frontend # {"$imagepolicy": "flux-system:frontend"}

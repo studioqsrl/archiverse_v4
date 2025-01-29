@@ -8,4 +8,4 @@ spec:
     spec:
       containers:
       - name: app-pool
-        image: archiverseacr.azurecr.io/frontend:v1.0.0  # Will be updated manually via PRs
+        image: archiverseacr.azurecr.io/frontend:v1.0.0  # Production uses explicit version tags, updated via PRs after testing in development

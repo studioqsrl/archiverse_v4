@@ -19,11 +19,9 @@ spec:
         operator: Equal
         value: frontend
         effect: NoSchedule
-      imagePullSecrets:
-      - name: acr-auth
       containers:
       - name: app-pool
-        image: archiverseacr.azurecr.io/frontend:latest # Base image, will be overridden by overlays
+        image: archiverseacr.azurecr.io/frontend # Base image, tag will be set by environment overlays
         ports:
         - containerPort: 3000
         resources:
@@ -114,17 +112,6 @@ spec:
             port: 3000
           failureThreshold: 30
           periodSeconds: 10
-        volumeMounts:
-        - name: secrets-store
-          mountPath: "/mnt/secrets-store"
-          readOnly: true
-      volumes:
-      - name: secrets-store
-        csi:
-          driver: secrets-store.csi.k8s.io
-          readOnly: true
-          volumeAttributes:
-            secretProviderClass: archiverse-kv-secrets
 ---
 apiVersion: v1
 kind: Service

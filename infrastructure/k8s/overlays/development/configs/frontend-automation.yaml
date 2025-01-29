@@ -7,8 +7,6 @@ metadata:
 spec:
   image: archiverseacr.azurecr.io/frontend
   interval: 1m0s
-  secretRef:
-    name: acr-auth
 ---
 apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImagePolicy
@@ -19,8 +17,8 @@ spec:
   imageRepositoryRef:
     name: frontend
   policy:
-    semver:
-      range: '>=0.0.0'
+    numerical:
+      order: asc  # Use numerical ordering for Run.ID tags
 ---
 apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImageUpdateAutomation
