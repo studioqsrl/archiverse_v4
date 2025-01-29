@@ -4,7 +4,6 @@ kind: Kustomization
 resources:
 - cert-manager
 - letsencrypt
-- vault
 - gatekeeper
 - network-policies
 - workload-identity

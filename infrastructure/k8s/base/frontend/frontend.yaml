@@ -14,20 +14,9 @@ spec:
         azure.workload.identity/use: "true"
     spec:
       serviceAccountName: frontend-sa
-      volumes:
-      - name: secrets-store
-        csi:
-          driver: secrets-store.csi.x-k8s.io
-          readOnly: true
-          volumeAttributes:
-            secretProviderClass: archiverse-frontend-secrets
       containers:
       - name: app-pool
         image: archiverseacr.azurecr.io/frontend # Base image, tag will be set by environment overlays
-        volumeMounts:
-        - name: secrets-store
-          mountPath: "/mnt/secrets-store"
-          readOnly: true
         ports:
         - containerPort: 3000
         resources:
@@ -43,63 +32,63 @@ spec:
         - name: APP_BASE_URL
           valueFrom:
             secretKeyRef:
-              name: archiverse-env
-              key: APP_BASE_URL
+              name: archiverse-secrets
+              key: app_base_url
         - name: NEXT_PUBLIC_AUTH0_DOMAIN
           valueFrom:
             secretKeyRef:
-              name: archiverse-env
-              key: NEXT_PUBLIC_AUTH0_DOMAIN
+              name: archiverse-secrets
+              key: next_public_auth0_domain
         - name: AUTH0_MANAGEMENT_API_DOMAIN
           valueFrom:
             secretKeyRef:
-              name: archiverse-env
-              key: AUTH0_MANAGEMENT_API_DOMAIN
+              name: archiverse-secrets
+              key: auth0_management_api_domain
         - name: SESSION_ENCRYPTION_SECRET
           valueFrom:
             secretKeyRef:
-              name: archiverse-frontend-secrets
-              key: SESSION_ENCRYPTION_SECRET
+              name: archiverse-secrets
+              key: session_encryption_secret
         - name: AUTH0_CLIENT_ID
           valueFrom:
             secretKeyRef:
-              name: archiverse-env
-              key: AUTH0_CLIENT_ID
+              name: archiverse-secrets
+              key: auth0_client_id
         - name: AUTH0_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
-              name: archiverse-frontend-secrets
-              key: AUTH0_CLIENT_SECRET
+              name: archiverse-secrets
+              key: auth0_client_secret
         - name: AUTH0_MANAGEMENT_CLIENT_ID
           valueFrom:
             secretKeyRef:
-              name: archiverse-env
-              key: AUTH0_MANAGEMENT_CLIENT_ID
+              name: archiverse-secrets
+              key: auth0_management_client_id
         - name: AUTH0_MANAGEMENT_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
-              name: archiverse-frontend-secrets
-              key: AUTH0_MANAGEMENT_CLIENT_SECRET
+              name: archiverse-secrets
+              key: auth0_management_client_secret
         - name: AUTH0_ADMIN_ROLE_ID
           valueFrom:
             secretKeyRef:
-              name: archiverse-env
-              key: AUTH0_ADMIN_ROLE_ID
+              name: archiverse-secrets
+              key: auth0_admin_role_id
         - name: AUTH0_MEMBER_ROLE_ID
           valueFrom:
             secretKeyRef:
-              name: archiverse-env
-              key: AUTH0_MEMBER_ROLE_ID
+              name: archiverse-secrets
+              key: auth0_member_role_id
         - name: DEFAULT_CONNECTION_ID
           valueFrom:
             secretKeyRef:
-              name: archiverse-env
-              key: DEFAULT_CONNECTION_ID
+              name: archiverse-secrets
+              key: default_connection_id
         - name: CUSTOM_CLAIMS_NAMESPACE
           valueFrom:
             secretKeyRef:
-              name: archiverse-env
-              key: CUSTOM_CLAIMS_NAMESPACE
+              name: archiverse-secrets
+              key: custom_claims_namespace
         livenessProbe:
           httpGet:
             path: /
