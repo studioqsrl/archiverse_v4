@@ -1,11 +1,9 @@
 apiVersion: containerservice.azure.com/v1api20240801
-kind: ManagedClustersAgentPool
+kind: AgentPool
 metadata:
   name: databasepool
   namespace: azureserviceoperator-system
 spec:
-  owner:
-    name: archiverse
   mode: User
   count: 1
   vmSize: Standard_D2pls_v6
