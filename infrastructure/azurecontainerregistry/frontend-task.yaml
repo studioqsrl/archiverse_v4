@@ -1,11 +1,14 @@
-name: frontend-build
-registry: archiverseacr
-image: frontend:{{.Run.ID}},frontend:latest
-file: frontend/Dockerfile
-context: https://github.com/studioqsrl/archiverse_v4.git#main
-git-access-token: $GITHUB_TOKEN
+version: v1.1.0
+steps:
+  - build: -t $Registry/frontend:$ID -t $Registry/frontend:latest -f frontend/Dockerfile .
+    workingDirectory: .
+trigger:
+  when:
+    - sourcePath:
+        - "frontend/**"
+        - "package.json"
+        - "package-lock.json"
 platform:
   os: Linux
   architecture: arm64
   variant: v8
-verbose: true

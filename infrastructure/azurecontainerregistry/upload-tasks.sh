@@ -11,16 +11,21 @@ az acr task delete --name "app-service-build" --registry "archiverseacr" --yes |
 
 echo "Creating ACR tasks in archiverseacr..."
 
+# Check if GITHUB_TOKEN is set
+if [ -z "$GITHUB_TOKEN" ]; then
+  echo "Error: GITHUB_TOKEN environment variable is not set"
+  exit 1
+fi
+
 # Frontend task
 echo "Creating frontend task..."
 az acr task create \
   --name "frontend-build" \
   --registry "archiverseacr" \
-  --image "frontend:{{.Run.ID}}" \
-  --file "frontend/Dockerfile" \
   --context "https://github.com/studioqsrl/archiverse_v4.git#main" \
-  --git-access-token "$GITHUB_TOKEN" \
-  --platform "linux/arm64" \
+  --file "infrastructure/azurecontainerregistry/frontend-task.yaml" \
+  --git-access-token "${GITHUB_TOKEN}" \
+  --commit-trigger-enabled true \
   --verbose
 
 # App Service task
@@ -31,7 +36,8 @@ az acr task create \
   --image "app-service:{{.Run.ID}}" \
   --file "backend/app_service/Dockerfile" \
   --context "https://github.com/studioqsrl/archiverse_v4.git#main" \
-  --git-access-token "$GITHUB_TOKEN" \
+  --git-access-token "${GITHUB_TOKEN}" \
+  --commit-trigger-enabled true \
   --verbose
 
 echo "All tasks have been created successfully!"
