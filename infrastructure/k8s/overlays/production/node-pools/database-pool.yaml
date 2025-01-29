@@ -15,9 +15,7 @@ spec:
   osDiskSizeGB: 512
   osType: Linux
   nodeTaints:
-    - key: "workload"
-      value: "database"
-      effect: "NoSchedule"
+    - "workload=database:NoSchedule"
   nodeLabels:
     workload: database
     persistence: "true"

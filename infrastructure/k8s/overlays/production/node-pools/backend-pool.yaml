@@ -15,8 +15,6 @@ spec:
   osDiskSizeGB: 128
   osType: Linux
   nodeTaints:
-    - key: "workload"
-      value: "backend"
-      effect: "NoSchedule"
+    - "workload=backend:NoSchedule"
   nodeLabels:
     workload: backend

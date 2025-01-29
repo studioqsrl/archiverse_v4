@@ -15,8 +15,6 @@ spec:
   osDiskSizeGB: 64
   osType: Linux
   nodeTaints:
-    - key: "workload"
-      value: "frontend"
-      effect: "NoSchedule"
+    - "workload=frontend:NoSchedule"
   nodeLabels:
     workload: frontend
