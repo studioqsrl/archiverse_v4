@@ -4,4 +4,8 @@ image: frontend:{{.Run.ID}},frontend:latest
 file: frontend/Dockerfile
 context: https://github.com/studioqsrl/archiverse_v4.git#main
 git-access-token: $GITHUB_TOKEN
+platform:
+  os: Linux
+  architecture: arm64
+  variant: v8
 verbose: true
