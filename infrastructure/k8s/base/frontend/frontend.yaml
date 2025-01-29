@@ -4,6 +4,7 @@ metadata:
   name: frontend
   namespace: archiverse
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: frontend
