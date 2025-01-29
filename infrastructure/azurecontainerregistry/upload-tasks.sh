@@ -28,6 +28,7 @@ az acr task create \
   --commit-trigger-enabled true \
   --platform "linux/arm64/v8" \
   --image "frontend:{{.Run.ID}}" \
+  --set triggers.includePaths='["frontend/**","package.json","package-lock.json"]' \
   --verbose
 
 # App Service task
