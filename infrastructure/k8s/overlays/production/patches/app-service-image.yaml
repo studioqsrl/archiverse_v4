@@ -21,4 +21,4 @@ spec:
         effect: NoSchedule
       containers:
       - name: app-pool
-        image: archiverseacr.azurecr.io/app-service:cb8u  # Using arm64 compatible image
+        image: archiverseacr.azurecr.io/app-service:cb9c  # Using arm64 compatible image
