@@ -3,7 +3,8 @@ kind: Kustomization
 
 resources:
 - ../../base
-- node-pools
+# Node pools are managed directly through Azure CLI
+# - node-pools
 
 patches:
 - path: patches/frontend-image.yaml
