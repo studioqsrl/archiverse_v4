@@ -7,5 +7,5 @@ spec:
   location: westeurope
   operatorSpec:
     secretExpressions:
-    - name: azure-service-operator
+    - name: aso-controller-settings
       key: AZURE_SUBSCRIPTION_ID
