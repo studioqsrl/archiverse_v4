@@ -27,24 +27,27 @@ spec:
           ports:
             - containerPort: 5432
               name: postgres
-          command:
-            - "/bin/bash"
-            - "-c"
-            - |
-              export POSTGRES_USER=$(cat /mnt/secrets-store/postgres-user)
-              export POSTGRES_PASSWORD=$(cat /mnt/secrets-store/postgres-password)
-              export POSTGRES_DB=archiverse
-              export PGDATA=/var/lib/postgresql/data/pgdata
-              docker-entrypoint.sh postgres
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: postgres-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: postgres-password
+            - name: POSTGRES_DB
+              value: archiverse
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
             - name: postgres-config
               mountPath: /etc/postgresql/postgresql.conf
               subPath: postgresql.conf
-            - name: secrets-store-inline
-              mountPath: "/mnt/secrets-store"
-              readOnly: true
           resources:
             requests:
               memory: "512Mi"
@@ -76,18 +79,10 @@ spec:
                 - postgres
             failureThreshold: 30
             periodSeconds: 10
-      annotations:
-        checksum/secrets: ${SECRETS_CHECKSUM}
       volumes:
         - name: postgres-config
           configMap:
             name: postgres-config
-        - name: secrets-store-inline
-          csi:
-            driver: secrets-store.csi.k8s.io
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: archiverse-secrets
   volumeClaimTemplates:
     - metadata:
         name: postgres-data

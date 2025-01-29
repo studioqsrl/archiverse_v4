@@ -3,5 +3,4 @@ kind: Kustomization
 
 resources:
 - frontend.yaml
-- secret-provider.yaml
 - service-account.yaml
