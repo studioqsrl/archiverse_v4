@@ -1,10 +1,13 @@
 version: v1.1.0
 stepTimeout: 28800
 steps:
-  - id: build
-    build: -t {{.Run.Registry}}/frontend:{{.Run.ID}} -t {{.Run.Registry}}/frontend:latest -f frontend/Dockerfile .
+  - build: >
+      -t {{.Run.Registry}}/frontend:{{.Run.ID}}
+      -t {{.Run.Registry}}/frontend:latest
+      -f frontend/Dockerfile
+      .
     workingDirectory: .
-    ignoreErrors: false
+    id: build
     when:
       - sourcePath:
           - "frontend/**"
