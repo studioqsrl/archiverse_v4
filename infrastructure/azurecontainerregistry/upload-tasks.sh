@@ -20,6 +20,7 @@ az acr task create \
   --file "frontend/Dockerfile" \
   --context "https://github.com/studioqsrl/archiverse_v4.git#main" \
   --git-access-token "$GITHUB_TOKEN" \
+  --platform "linux/arm64" \
   --verbose
 
 # App Service task
