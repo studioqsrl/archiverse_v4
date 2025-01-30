@@ -7,3 +7,6 @@ metadata:
 spec:
   image: archiverseacr.azurecr.io/frontend
   interval: 1m0s
+  secretRef:
+    name: regcred
+  provider: azure
