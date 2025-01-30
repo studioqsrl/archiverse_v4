@@ -28,6 +28,7 @@ az acr task create \
   --commit-trigger-enabled true \
   --platform "linux/arm64/v8" \
   --image "frontend:{{.Run.ID}}" \
+  --image "frontend:latest" \
   --verbose
 
 # App Service task
@@ -35,12 +36,13 @@ echo "Creating app service task..."
 az acr task create \
   --name "app-service-build" \
   --registry "archiverseacr" \
-  --image "app-service:{{.Run.ID}}" \
   --file "backend/app_service/Dockerfile" \
   --context "https://github.com/studioqsrl/archiverse_v4.git#main" \
   --git-access-token "${GITHUB_TOKEN}" \
   --commit-trigger-enabled true \
   --platform "linux/arm64/v8" \
+  --image "app-service:{{.Run.ID}}" \
+  --image "app-service:latest" \
   --verbose
 
 echo "All tasks have been created successfully!"
