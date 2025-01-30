@@ -1,109 +1,98 @@
-# Frontend Image Deployment Strategy
+# Flux Image Automation
 
-This document describes how frontend container images are deployed across different environments using Flux.
+This document describes the image automation setup for the Archiverse project using Flux.
 
-## Image Tagging Strategy
+## Overview
 
-We use a hybrid approach for managing container image tags:
+Flux is configured to automatically scan our Azure Container Registry (ACR) for new images and update the deployments accordingly.
 
-### Base Configuration
-- Located in: `base/frontend/frontend.yaml`
-- Uses untagged image reference: `archiverseacr.azurecr.io/frontend`
-- Tags are set by environment-specific overlays
+## Components
 
-### Development Environment
-- Located in: `overlays/development/`
-- Uses Flux image automation to track Run.ID tags
-- Automatically updates when new images are built by ACR tasks
-- Configuration:
-  - ImageRepository: Monitors ACR for new images
-  - ImagePolicy: Uses numerical ordering for Run.ID tags
-  - ImageUpdateAutomation: Updates Git repository automatically
+### 1. ACR Authentication
 
-### Production Environment
-- Located in: `overlays/production/`
-- Uses explicit, immutable version tags (e.g., v1.0.0)
-- Tags are updated manually through Pull Requests
-- Ensures controlled, reproducible deployments
+Authentication to ACR is handled via a Kubernetes secret:
 
-## Deployment Workflow
+```bash
+# Create the docker-registry secret in flux-system namespace
+kubectl create secret docker-registry regcred -n flux-system \
+  --docker-server=archiverseacr.azurecr.io \
+  --docker-username=archiverseacr \
+  --docker-password=<acr-password>
+```
 
-### Development
-1. ACR Task builds new image with Run.ID tag:
-   ```yaml
-   # infrastructure/azurecontainerregistry/frontend-task.yaml
-   name: frontend-build
-   image: frontend:{{.Run.ID}}
-   ```
+### 2. Image Repository Configuration
 
-2. Flux automatically:
-   - Detects new image in ACR
-   - Updates development overlay
-   - Commits and pushes changes
-   - Deploys new version
+The ImageRepository resource (`configs/frontend-repository.yaml`) is configured to scan our ACR:
 
-### Production
-1. Test new version in development environment
-2. Create PR to update production image tag:
-   ```yaml
-   # infrastructure/k8s/overlays/production/patches/frontend-image.yaml
-   spec:
-     template:
-       spec:
-         containers:
-         - name: app-pool
-           image: archiverseacr.azurecr.io/frontend:v1.0.0
-   ```
-3. Review and merge PR
-4. Flux applies changes to production cluster
+```yaml
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: frontend
+  namespace: flux-system
+spec:
+  image: archiverseacr.azurecr.io/frontend
+  interval: 1m0s
+  secretRef:
+    name: regcred
+  provider: azure
+```
+
+This configuration:
+- Scans the ACR repository every minute
+- Uses the `regcred` secret for authentication
+- Specifies Azure as the provider for ACR-specific authentication
+
+### 3. Image Policy
+
+The ImagePolicy resource (`configs/frontend-policy.yaml`) defines which tags to use:
+
+```yaml
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: frontend
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: frontend
+  policy:
+    alphabetical:
+      order: asc
+```
+
+This configuration selects the 'latest' tag for automated updates.
 
 ## Verification
 
-Check deployment status:
+You can verify the setup using these commands:
+
 ```bash
-# Get current image versions
-kubectl get deployment frontend -n archiverse -o=jsonpath='{.spec.template.spec.containers[0].image}'
+# Check ImageRepository status
+kubectl get imagerepositories.image.toolkit.fluxcd.io -n flux-system frontend -o yaml
 
-# Check Flux image automation
-flux get image all -A
-
-# Check image repository
-flux get image repository frontend -n flux-system
-
-# Check image policy
-flux get image policy frontend -n flux-system
+# Check ImagePolicy status
+kubectl get imagepolicies.image.toolkit.fluxcd.io -n flux-system frontend -o yaml
 ```
+
+A successful configuration will show:
+- ImageRepository scanning ACR successfully
+- ImagePolicy resolving the latest tag correctly
 
 ## Troubleshooting
 
-### Development Environment
-1. Image not updating:
-   ```bash
-   # Check image repository status
-   flux get image repository frontend -n flux-system
-   
-   # Check image policy
-   flux get image policy frontend -n flux-system
-   
-   # Check automation status
-   flux get image update frontend -n flux-system
-   ```
+If image scanning fails:
 
-2. Check pod status:
-   ```bash
-   kubectl describe pod -n archiverse -l app=frontend
-   ```
+1. Verify the secret exists and has correct credentials:
+```bash
+kubectl get secret -n flux-system regcred
+```
 
-### Production Environment
-1. Before updating image tag:
-   - Verify image exists in ACR
-   - Test image in development environment
-   - Follow semantic versioning for tags
+2. Check ImageRepository logs:
+```bash
+kubectl logs -n flux-system deployment/image-reflector-controller
+```
 
-2. After updating:
-   ```bash
-   # Check deployment rollout
-   kubectl rollout status deployment/frontend -n archiverse
-   
-   # Check pod status
-   kubectl get pods -n archiverse -l app=frontend
+3. Ensure the ACR repository exists and is accessible:
+```bash
+az acr repository show -n archiverseacr --repository frontend
