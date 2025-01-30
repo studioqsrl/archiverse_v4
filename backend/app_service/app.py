@@ -1,30 +1,18 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from dotenv import load_dotenv
-
-load_dotenv()
+from config import Settings, get_settings
 
 app = FastAPI(title="Archiverse App Service")
 
-# CORS configuration
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # In production, this should be configured to specific origins
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-def get_db_connection():
+def get_db_connection(settings: Settings = Depends(get_settings)):
     try:
         return psycopg2.connect(
-            host=os.getenv("POSTGRES_HOST", "postgres"),
-            database=os.getenv("POSTGRES_DB", "archiverse"),
-            user=os.getenv("POSTGRES_USER", "postgres"),
-            password=os.getenv("POSTGRES_PASSWORD"),
+            host=settings.postgres_host,
+            database=settings.postgres_db,
+            user=settings.postgres_user,
+            password=settings.postgres_password,
             cursor_factory=RealDictCursor
         )
     except psycopg2.Error as e:
@@ -35,16 +23,16 @@ async def health_check():
     return {"status": "healthy"}
 
 @app.get("/version")
-async def version():
+async def version(settings: Settings = Depends(get_settings)):
     return {
         "version": "1.0.0",
         "name": "Archiverse App Service",
-        "environment": os.getenv("ENVIRONMENT", "development")
+        "environment": settings.environment
     }
 
 @app.get("/api/data")
-async def get_data():
-    conn = get_db_connection()
+async def get_data(settings: Settings = Depends(get_settings)):
+    conn = get_db_connection(settings)
     try:
         with conn.cursor() as cur:
             # Sample query - modify based on your actual database schema
