@@ -20,7 +20,13 @@ kubectl create secret docker-registry regcred -n flux-system \
   --docker-password=<acr-password>
 ```
 
-### 2. Image Repository Configuration
+### 2. ACR Tasks Configuration
+
+The ACR tasks are configured to build and push two tags for each image:
+- A unique tag using the Run ID (`{{.Run.ID}}`)
+- The 'latest' tag which is automatically updated with each successful build
+
+### 3. Image Repository Configuration
 
 The ImageRepository resource (`configs/frontend-repository.yaml`) is configured to scan our ACR:
 
